@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Playfair_Display, Inter } from 'next/font/google';
 import ValueOverlay, { launchPadHighlights } from '@/components/ValueOverlay';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '700'] });
 const inter = Inter({ subsets: ['latin'], weight: ['400', '600', '700'] });
