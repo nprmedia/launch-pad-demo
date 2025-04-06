@@ -20,8 +20,12 @@ export default function ValueOverlay({ highlights, theme }: Props) {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [positions, setPositions] = useState<{ top: number; left: number; width: number; height: number }[]>([]);
   const [autoplay, setAutoplay] = useState(true);
+  const [interrupted, setInterrupted] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const color = theme?.color || 'indigo';
+  const background = theme?.background || 'white';
 
   useEffect(() => {
     const computePositions = () => {
@@ -43,53 +47,71 @@ export default function ValueOverlay({ highlights, theme }: Props) {
 
     computePositions();
     window.addEventListener('resize', computePositions);
-    window.addEventListener('scroll', computePositions);
+    window.addEventListener('scroll', handleInterrupt);
+    window.addEventListener('keydown', handleKeyNav);
     return () => {
       window.removeEventListener('resize', computePositions);
-      window.removeEventListener('scroll', computePositions);
+      window.removeEventListener('scroll', handleInterrupt);
+      window.removeEventListener('keydown', handleKeyNav);
     };
   }, [highlights]);
 
   useEffect(() => {
     if (activeIndex >= highlights.length || !positions[activeIndex]) return;
     const { top } = positions[activeIndex];
-    window.scrollTo({ top: top - window.innerHeight / 2 + positions[activeIndex].height / 2, behavior: 'smooth' });
+    window.scrollTo({
+      top: top - window.innerHeight / 2 + positions[activeIndex].height / 2,
+      behavior: 'smooth',
+    });
 
-    if (autoplay) {
+    if (autoplay && !interrupted) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
         if (activeIndex < highlights.length - 1) setActiveIndex((prev) => prev + 1);
         else setAutoplay(false);
       }, 3500);
     }
-  }, [activeIndex, positions, autoplay]);
+  }, [activeIndex, positions, autoplay, interrupted]);
 
-  const color = theme?.color || 'indigo';
-  const background = theme?.background || 'white';
+  const handleInterrupt = () => {
+    if (autoplay) {
+      setAutoplay(false);
+      setInterrupted(true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    }
+  };
+
+  const handleKeyNav = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowRight') handleManualAdvance();
+    if (e.key === 'ArrowLeft' && activeIndex > 0) setActiveIndex((prev) => prev - 1);
+  };
 
   const handleManualAdvance = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (activeIndex < highlights.length - 1) setActiveIndex(activeIndex + 1);
     else setActiveIndex(highlights.length);
     setAutoplay(false);
+    setInterrupted(false);
   };
 
   const handleReset = () => {
     setAutoplay(true);
     setActiveIndex(0);
+    setInterrupted(false);
   };
 
   if (activeIndex >= highlights.length) return null;
 
   return (
     <div ref={overlayRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-all duration-500" />
       <AnimatePresence>
         {positions[activeIndex] && (
           <motion.div
             key={activeIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.4 }}
             style={{
               top: positions[activeIndex].top,
@@ -97,12 +119,17 @@ export default function ValueOverlay({ highlights, theme }: Props) {
               width: positions[activeIndex].width,
               height: positions[activeIndex].height,
             }}
-            className={`absolute border-4 border-${color}-500 rounded-xl bg-${color}-500/10 backdrop-blur-md p-4 pointer-events-none`}
+            className={`absolute border-4 border-${color}-500 rounded-xl bg-${color}-500/10 backdrop-blur-sm p-4 pointer-events-none shadow-2xl transition-all duration-500`}
           >
-            <div className={`text-${background} text-sm font-medium text-center mt-auto absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] bg-${color}-700/80 px-4 py-2 rounded-md shadow-lg`}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className={`text-${background} text-sm font-medium text-center mt-auto absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] bg-${color}-700/80 px-4 py-2 rounded-md shadow-lg`}
+            >
               <div className={`w-3 h-3 rotate-45 bg-${color}-700 absolute -top-1 left-1/2 -translate-x-1/2`} />
               {highlights[activeIndex].message}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -110,8 +137,9 @@ export default function ValueOverlay({ highlights, theme }: Props) {
       <div className="fixed bottom-6 right-6 z-[200] flex flex-col items-end gap-2 pointer-events-auto">
         <div className="flex gap-1 mb-2">
           {highlights.map((_, idx) => (
-            <div
+            <button
               key={idx}
+              onClick={() => setActiveIndex(idx)}
               className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                 idx === activeIndex ? `bg-${color}-500 scale-125` : 'bg-white/30'
               }`}
@@ -121,7 +149,7 @@ export default function ValueOverlay({ highlights, theme }: Props) {
         <div className="flex gap-2">
           <button
             onClick={handleManualAdvance}
-            className={`bg-${color}-600 hover:bg-${color}-700 text-${background} px-4 py-2 rounded-full shadow-lg`}
+            className={`bg-${color}-600 hover:bg-${color}-700 text-${background} px-6 py-2 text-sm font-semibold rounded-full shadow-lg ring-2 ring-${color}-400 animate-pulse`}
           >
             {activeIndex < highlights.length - 1 ? 'Next' : 'Finish'}
           </button>
@@ -132,12 +160,30 @@ export default function ValueOverlay({ highlights, theme }: Props) {
             Replay
           </button>
         </div>
+        {interrupted && (
+          <div className="mt-2 flex flex-col items-end">
+            <p className="text-xs text-white/60 mb-1">You scrolled — walkthrough paused.</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setAutoplay(true)}
+                className={`bg-${color}-700 hover:bg-${color}-800 text-white text-xs px-3 py-1 rounded-full`}
+              >
+                Continue
+              </button>
+              <button
+                onClick={handleReset}
+                className={`bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1 rounded-full`}
+              >
+                Start Over
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-// Example config to copy
 export const launchPadHighlights: Highlight[] = [
   {
     targetId: 'main-cta',
