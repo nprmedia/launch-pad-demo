@@ -38,7 +38,7 @@ type Props = {
 export default function ValueOverlay({ highlights }: Props) {
   const [active, setActive] = useState(false);
   const [scrolling, setScrolling] = useState(false);
-  const [current, setCurrent] = useState<number | null>(null);
+  const [current, setCurrent] = useState<number>(-1);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -63,16 +63,17 @@ export default function ValueOverlay({ highlights }: Props) {
     setCurrent(index);
     const el = document.getElementById(highlights[index].id);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    timeoutRef.current = setTimeout(() => scrollStep(index + 1), 2000);
+    timeoutRef.current = setTimeout(() => scrollStep(index + 1), 2200);
   };
 
   const startGuidedScroll = () => {
     if (scrolling) return stopScroll();
     setActive(true);
     setScrolling(true);
-    setCurrent(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    timeoutRef.current = setTimeout(() => scrollStep(0), 800);
+    setCurrent(0);
+    const el = document.getElementById(highlights[0].id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    timeoutRef.current = setTimeout(() => scrollStep(1), 2000);
   };
 
   return (
@@ -87,12 +88,13 @@ export default function ValueOverlay({ highlights }: Props) {
       </div>
 
       <AnimatePresence>
-        {active && current !== null &&
+        {active && current >= 0 &&
           (() => {
             const { id, message } = highlights[current];
             const el = document.getElementById(id);
             if (!el) return null;
-                        const scrollTop = window.scrollY;
+            const rect = el.getBoundingClientRect();
+            const scrollTop = window.scrollY;
             const scrollLeft = window.scrollX;
             const bounds = el.getBoundingClientRect();
             const top = bounds.top + scrollTop;
