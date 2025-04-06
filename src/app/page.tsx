@@ -2,9 +2,9 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import ValueOverlay from '@/components/ValueOverlay';
 import { useState } from 'react';
 import { Playfair_Display, Inter } from 'next/font/google';
+import ValueOverlay, { launchPadHighlights } from '@/components/ValueOverlay';
 
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '700'] });
 const inter = Inter({ subsets: ['latin'], weight: ['400', '600', '700'] });
@@ -48,7 +48,7 @@ export default function LaunchPadPage() {
 
   return (
     <main className={`${inter.className} bg-white text-gray-900`}>
-      <ValueOverlay />
+      <ValueOverlay highlights={launchPadHighlights} />
 
       {/* Hero */}
       <section
