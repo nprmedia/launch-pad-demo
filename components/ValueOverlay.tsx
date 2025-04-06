@@ -97,8 +97,9 @@ export default function ValueOverlay({ highlights }: Props) {
                   width: pos.width + 32,
                   height: pos.height + 32,
                 }}
-                className="z-40 pointer-events-none border-4 border-yellow-400 rounded-2xl shadow-xl animate-pulse"
+                className="z-30 pointer-events-none"
               >
+                <div className="w-full h-full border-4 border-yellow-400 rounded-2xl shadow-xl animate-pulse"></div>
                 <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg">
                   {message}
                 </div>
