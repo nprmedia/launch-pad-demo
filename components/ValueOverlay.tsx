@@ -152,6 +152,10 @@ export const launchPadHighlights: Highlight[] = [
     message: 'Feature list styled to communicate value clearly and fast.',
   },
   {
+    targetId: 'social-proof',
+    message: 'Trust-building layout inspired by 7-figure coaching sites.',
+  },
+  {
     targetId: 'faq',
     message: 'Handles objections before they happen — fast and scrollable.',
   },
