@@ -23,39 +23,16 @@ type Props = {
 };
 
 export default function ValueOverlay({ highlights }: Props) {
-  const [active, setActive] = useState(false);
-  const [scrolling, setScrolling] = useState(false);
   const [current, setCurrent] = useState<number>(-1);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.innerHTML = 'body { overflow-x: hidden !important; }';
-    document.head.appendChild(style);
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-
-  const stopScroll = () => {
-    setScrolling(false);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  };
-
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-  const startGuidedScroll = async () => {
-    if (scrolling) return stopScroll();
-    setActive(true);
-    setScrolling(true);
-    setCurrent(0);
-
+  const runWalkthrough = async () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    await delay(400);
+    await delay(600);
 
     for (let i = 0; i < highlights.length; i++) {
-      if (!scrolling) break;
-
       const el = document.getElementById(highlights[i].id);
       const section = el?.closest('section') || el;
       if (!section) continue;
@@ -65,14 +42,35 @@ export default function ValueOverlay({ highlights }: Props) {
       await delay(2200);
     }
 
-    setScrolling(false);
+    setCurrent(-1);
   };
+
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = 'body { overflow-x: hidden !important; }';
+    document.head.appendChild(style);
+    runWalkthrough();
+    return () => {
+      document.head.removeChild(style);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   return (
     <>
+      {current === -1 && (
+        <div className="fixed bottom-4 right-4 z-[1001]">
+          <button
+            onClick={runWalkthrough}
+            className="px-4 py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 shadow-md"
+          >
+            🔁 Replay Value Highlights
+          </button>
+        </div>
+      )}
       {/* Dimmed Background */}
       <AnimatePresence>
-        {active && (
+        {current >= 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -83,19 +81,9 @@ export default function ValueOverlay({ highlights }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Toggle Button */}
-      <div className="fixed bottom-0 right-0 z-[1000] p-4">
-        <button
-          onClick={startGuidedScroll}
-          className="px-4 py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 shadow-md"
-        >
-          {scrolling ? '⏹ Stop Walkthrough' : active ? '🔁 Replay Value Highlights' : '💡 Show Why This Costs $1,000'}
-        </button>
-      </div>
-
       {/* Overlay Highlight */}
       <AnimatePresence>
-        {active && current >= 0 && (() => {
+        {current >= 0 && (() => {
           const { id, message } = highlights[current];
           const el = document.getElementById(id);
           if (!el) return null;
