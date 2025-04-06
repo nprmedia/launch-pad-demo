@@ -212,6 +212,7 @@ export default function LaunchPadPage() {
       <footer className="py-6 text-center text-sm text-gray-400 bg-gray-100">
         &copy; 2025 NPR Media. All rights reserved.
       </footer>
+      <SpeedInsights />
     </main>
   );
 }
