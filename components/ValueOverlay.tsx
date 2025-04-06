@@ -38,7 +38,9 @@ export default function ValueOverlay({ highlights }: Props) {
       if (!section) continue;
 
       setCurrent(i);
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const rect = section.getBoundingClientRect();
+      const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2 - rect.height / 2);
+      window.scrollTo({ top: offsetTop, behavior: 'smooth' });
       await delay(2200);
     }
 
