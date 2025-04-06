@@ -93,8 +93,7 @@ export default function ValueOverlay({ highlights }: Props) {
             const { id, message } = highlights[current];
             const el = document.getElementById(id);
             if (!el) return null;
-            const rect = el.getBoundingClientRect();
-            const scrollTop = window.scrollY;
+                        const scrollTop = window.scrollY;
             const scrollLeft = window.scrollX;
             const bounds = el.getBoundingClientRect();
             const top = bounds.top + scrollTop;
