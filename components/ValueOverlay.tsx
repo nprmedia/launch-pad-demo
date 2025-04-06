@@ -47,7 +47,8 @@ export default function ValueOverlay({ highlights }: Props) {
   const [positions, setPositions] = useState<Record<string, HighlightPosition>>({});
 
   useEffect(() => {
-    if (active) {
+    const calculatePositions = () => {
+      if (!active) return;
       const newPos: Record<string, HighlightPosition> = {};
       highlights.forEach(({ id }) => {
         const el = document.getElementById(id);
@@ -62,9 +63,15 @@ export default function ValueOverlay({ highlights }: Props) {
         }
       });
       setPositions(newPos);
-    } else {
-      setPositions({});
-    }
+    };
+
+    calculatePositions();
+    window.addEventListener('scroll', calculatePositions);
+    window.addEventListener('resize', calculatePositions);
+    return () => {
+      window.removeEventListener('scroll', calculatePositions);
+      window.removeEventListener('resize', calculatePositions);
+    };
   }, [active, highlights]);
 
   return (
@@ -92,15 +99,15 @@ export default function ValueOverlay({ highlights }: Props) {
                 transition={{ duration: 0.4 }}
                 style={{
                   position: 'absolute',
-                  top: pos.top - 16,
-                  left: pos.left - 16,
-                  width: pos.width + 32,
-                  height: pos.height + 32,
+                  top: `${pos.top - 16}px`,
+                  left: `${pos.left - 16}px`,
+                  width: `${pos.width + 32}px`,
+                  height: `${pos.height + 32}px`,
                 }}
-                className="z-30 pointer-events-none"
+                className="absolute z-30 pointer-events-none"
               >
                 <div className="w-full h-full border-4 border-yellow-400 rounded-2xl shadow-xl animate-pulse"></div>
-                <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg">
+                <div className="absolute left-1/2 -bottom-4 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg">
                   {message}
                 </div>
               </motion.div>
