@@ -37,6 +37,7 @@ type Props = {
 
 export default function ValueOverlay({ highlights }: Props) {
   const [active, setActive] = useState(false);
+  const [scrolling, setScrolling] = useState(false);
 
   useEffect(() => {
     const style = document.createElement('style');
@@ -47,52 +48,69 @@ export default function ValueOverlay({ highlights }: Props) {
     };
   }, []);
 
+  const startGuidedScroll = async () => {
+    setActive(true);
+    setScrolling(true);
+    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+    for (const { id } of highlights) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        await delay(1800);
+      }
+    }
+    setScrolling(false);
+  };
+
   return (
     <>
       <div className="fixed bottom-0 right-0 z-[1000] p-4">
         <button
-          onClick={() => setActive(!active)}
+          onClick={startGuidedScroll}
           className="px-4 py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 shadow-md"
+          disabled={scrolling}
         >
-          {active ? '❌ Hide Value Highlights' : '💡 Show Why This Costs $1,000'}
+          {scrolling ? 'Scrolling…' : active ? '🔁 Replay Value Highlights' : '💡 Show Why This Costs $1,000'}
         </button>
       </div>
 
       <AnimatePresence>
-        {active && highlights.map(({ id, message }) => {
-          const element = document.getElementById(id);
-          if (!element) return null;
+        {active &&
+          highlights.map(({ id, message }) => {
+            const element = document.getElementById(id);
+            if (!element) return null;
 
-          const rect = element.getBoundingClientRect();
-          const top = rect.top + window.scrollY - 16;
-          const left = rect.left + window.scrollX - 16;
-          const width = rect.width + 32;
-          const height = rect.height + 32;
+            const rect = element.getBoundingClientRect();
+            const top = rect.top + window.scrollY - 16;
+            const left = rect.left + window.scrollX - 16;
+            const width = rect.width + 32;
+            const height = rect.height + 32;
 
-          return (
-            <motion.div
-              key={id}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                position: 'absolute',
-                top,
-                left,
-                width,
-                height,
-                pointerEvents: 'none',
-                zIndex: 999,
-              }}
-            >
-              <div className="w-full h-full border-4 border-yellow-400 rounded-2xl shadow-xl animate-pulse"></div>
-              <div className="absolute left-1/2 -bottom-4 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center">
-                {message}
-              </div>
-            </motion.div>
-          );
-        })}
+            return (
+              <motion.div
+                key={id}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  position: 'absolute',
+                  top,
+                  left,
+                  width,
+                  height,
+                  pointerEvents: 'none',
+                  zIndex: 999,
+                }}
+              >
+                <div className="w-full h-full border-4 border-yellow-400 rounded-2xl shadow-xl animate-pulse"></div>
+                <div className="absolute top-full mt-3 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001]">
+                  {message}
+                </div>
+              </motion.div>
+            );
+          })}
       </AnimatePresence>
     </>
   );
