@@ -22,6 +22,8 @@ export default function ValueOverlay({ highlights, theme }: Props) {
   const [autoplay, setAutoplay] = useState(true);
   const [interrupted, setInterrupted] = useState(false);
   const [lastScrollY, setLastScrollY] = useState<number>(0);
+  const [isReady, setIsReady] = useState(false);
+
   const overlayRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -32,21 +34,22 @@ export default function ValueOverlay({ highlights, theme }: Props) {
     const computePositions = () => {
       const newPositions = highlights.map((highlight) => {
         const el = document.getElementById(highlight.targetId);
-        if (!el) return { top: 0, left: 0, width: 0, height: 0 };
+        if (!el) return { top: 0, left: 0, width: 300, height: 200 };
         const rect = el.getBoundingClientRect();
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
         const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
         return {
           top: rect.top + scrollTop,
           left: rect.left + scrollLeft,
-          width: rect.width,
-          height: rect.height,
+          width: rect.width || 300,
+          height: rect.height || 200,
         };
       });
       setPositions(newPositions);
+      setIsReady(true);
     };
 
-    computePositions();
+    setTimeout(computePositions, 200); // give DOM time to layout
     window.addEventListener('resize', computePositions);
     window.addEventListener('scroll', handleInterrupt);
     window.addEventListener('keydown', handleKeyNav);
@@ -58,21 +61,23 @@ export default function ValueOverlay({ highlights, theme }: Props) {
   }, [highlights]);
 
   useEffect(() => {
-    if (activeIndex >= highlights.length || !positions[activeIndex]) return;
+    if (!isReady || activeIndex >= highlights.length || !positions[activeIndex]) return;
     const { top } = positions[activeIndex];
-    window.scrollTo({
-      top: top - window.innerHeight / 2 + positions[activeIndex].height / 2,
-      behavior: 'smooth',
-    });
+    setTimeout(() => {
+      window.scrollTo({
+        top: top - window.innerHeight / 2 + positions[activeIndex].height / 2,
+        behavior: 'smooth',
+      });
+    }, 150);
 
     if (autoplay && !interrupted) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
         if (activeIndex < highlights.length - 1) setActiveIndex((prev) => prev + 1);
         else setAutoplay(false);
-      }, 3500);
+      }, 4000);
     }
-  }, [activeIndex, positions, autoplay, interrupted]);
+  }, [activeIndex, positions, autoplay, interrupted, isReady]);
 
   const handleInterrupt = () => {
     const currentScrollY = window.scrollY;
@@ -105,32 +110,35 @@ export default function ValueOverlay({ highlights, theme }: Props) {
     setInterrupted(false);
   };
 
-  if (activeIndex >= highlights.length) return null;
+  if (!isReady || activeIndex >= highlights.length) return null;
+
+  const current = positions[activeIndex];
 
   return (
     <div ref={overlayRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
       <div className="absolute inset-0 bg-black/20 transition-all duration-500" />
       <AnimatePresence>
-        {positions[activeIndex] && (
+        {current && (
           <motion.div
-            key={activeIndex}
-            initial={{ opacity: 0, scale: 0.98 }}
+            key={`overlay-${activeIndex}`}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.4 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.5 }}
             style={{
-              top: positions[activeIndex].top,
-              left: positions[activeIndex].left,
-              width: positions[activeIndex].width,
-              height: positions[activeIndex].height,
+              top: current.top,
+              left: current.left,
+              width: current.width,
+              height: current.height,
             }}
             className={`absolute border-4 border-${color}-500 rounded-xl bg-transparent p-4 pointer-events-none transition-all duration-500`}
           >
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              key={`tooltip-${activeIndex}`}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              className={`text-${background} text-sm font-medium text-center absolute bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-${color}-700/90 px-4 py-3 rounded-md shadow-lg`}
+              className={`text-${background} text-sm font-medium text-center absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] bg-${color}-700/90 px-4 py-3 rounded-md shadow-lg`}
             >
               <div className={`w-3 h-3 rotate-45 bg-${color}-700 absolute -top-1 left-1/2 -translate-x-1/2`} />
               {highlights[activeIndex].message}
