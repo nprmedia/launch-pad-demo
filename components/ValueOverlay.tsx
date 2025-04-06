@@ -21,6 +21,7 @@ export default function ValueOverlay({ highlights, theme }: Props) {
   const [positions, setPositions] = useState<{ top: number; left: number; width: number; height: number }[]>([]);
   const [autoplay, setAutoplay] = useState(true);
   const [interrupted, setInterrupted] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState<number>(0);
   const overlayRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -74,11 +75,15 @@ export default function ValueOverlay({ highlights, theme }: Props) {
   }, [activeIndex, positions, autoplay, interrupted]);
 
   const handleInterrupt = () => {
-    if (autoplay) {
-      setAutoplay(false);
-      setInterrupted(true);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    const currentScrollY = window.scrollY;
+    if (Math.abs(currentScrollY - lastScrollY) > 10) {
+      if (autoplay) {
+        setAutoplay(false);
+        setInterrupted(true);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      }
     }
+    setLastScrollY(currentScrollY);
   };
 
   const handleKeyNav = (e: KeyboardEvent) => {
@@ -104,7 +109,7 @@ export default function ValueOverlay({ highlights, theme }: Props) {
 
   return (
     <div ref={overlayRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-all duration-500" />
+      <div className="absolute inset-0 bg-black/20 transition-all duration-500" />
       <AnimatePresence>
         {positions[activeIndex] && (
           <motion.div
@@ -119,13 +124,13 @@ export default function ValueOverlay({ highlights, theme }: Props) {
               width: positions[activeIndex].width,
               height: positions[activeIndex].height,
             }}
-            className={`absolute border-4 border-${color}-500 rounded-xl bg-${color}-500/10 backdrop-blur-sm p-4 pointer-events-none shadow-2xl transition-all duration-500`}
+            className={`absolute border-4 border-${color}-500 rounded-xl bg-transparent p-4 pointer-events-none transition-all duration-500`}
           >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              className={`text-${background} text-sm font-medium text-center mt-auto absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] bg-${color}-700/80 px-4 py-2 rounded-md shadow-lg`}
+              className={`text-${background} text-sm font-medium text-center absolute bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-${color}-700/90 px-4 py-3 rounded-md shadow-lg`}
             >
               <div className={`w-3 h-3 rotate-45 bg-${color}-700 absolute -top-1 left-1/2 -translate-x-1/2`} />
               {highlights[activeIndex].message}
