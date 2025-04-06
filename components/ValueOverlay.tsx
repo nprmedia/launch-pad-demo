@@ -119,7 +119,7 @@ export default function ValueOverlay({ highlights }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.4 }}
-                className="absolute inset-0 m-auto flex items-center justify-center bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001]"
+                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001]"
               >
                 {message}
               </motion.div>
