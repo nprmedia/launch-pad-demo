@@ -17,9 +17,11 @@ interface Props {
 }
 
 export default function ValueOverlay({ highlights, theme }: Props) {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
   const [positions, setPositions] = useState<{ top: number; left: number; width: number; height: number }[]>([]);
+  const [autoplay, setAutoplay] = useState(true);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const computePositions = () => {
@@ -49,18 +51,40 @@ export default function ValueOverlay({ highlights, theme }: Props) {
   }, [highlights]);
 
   useEffect(() => {
-    if (activeIndex === null || !positions[activeIndex]) return;
+    if (activeIndex >= highlights.length || !positions[activeIndex]) return;
     const { top } = positions[activeIndex];
     window.scrollTo({ top: top - window.innerHeight / 2 + positions[activeIndex].height / 2, behavior: 'smooth' });
-  }, [activeIndex, positions]);
+
+    if (autoplay) {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        if (activeIndex < highlights.length - 1) setActiveIndex((prev) => prev + 1);
+        else setAutoplay(false);
+      }, 3500);
+    }
+  }, [activeIndex, positions, autoplay]);
 
   const color = theme?.color || 'indigo';
   const background = theme?.background || 'white';
 
+  const handleManualAdvance = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (activeIndex < highlights.length - 1) setActiveIndex(activeIndex + 1);
+    else setActiveIndex(highlights.length);
+    setAutoplay(false);
+  };
+
+  const handleReset = () => {
+    setAutoplay(true);
+    setActiveIndex(0);
+  };
+
+  if (activeIndex >= highlights.length) return null;
+
   return (
     <div ref={overlayRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
       <AnimatePresence>
-        {activeIndex !== null && positions[activeIndex] && (
+        {positions[activeIndex] && (
           <motion.div
             key={activeIndex}
             initial={{ opacity: 0 }}
@@ -83,17 +107,31 @@ export default function ValueOverlay({ highlights, theme }: Props) {
         )}
       </AnimatePresence>
 
-      <div className="fixed bottom-6 right-6 z-[200]">
-        <button
-          onClick={() => {
-            if (activeIndex === null) setActiveIndex(0);
-            else if (activeIndex < highlights.length - 1) setActiveIndex(activeIndex + 1);
-            else setActiveIndex(null);
-          }}
-          className={`bg-${color}-600 hover:bg-${color}-700 text-${background} px-4 py-2 rounded-full shadow-lg`}
-        >
-          {activeIndex === null ? 'Start Walkthrough' : activeIndex < highlights.length - 1 ? 'Next' : 'Finish'}
-        </button>
+      <div className="fixed bottom-6 right-6 z-[200] flex flex-col items-end gap-2 pointer-events-auto">
+        <div className="flex gap-1 mb-2">
+          {highlights.map((_, idx) => (
+            <div
+              key={idx}
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                idx === activeIndex ? `bg-${color}-500 scale-125` : 'bg-white/30'
+              }`}
+            />
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={handleManualAdvance}
+            className={`bg-${color}-600 hover:bg-${color}-700 text-${background} px-4 py-2 rounded-full shadow-lg`}
+          >
+            {activeIndex < highlights.length - 1 ? 'Next' : 'Finish'}
+          </button>
+          <button
+            onClick={handleReset}
+            className={`bg-${color}-500/70 hover:bg-${color}-600 text-${background} px-4 py-2 rounded-full shadow-lg`}
+          >
+            Replay
+          </button>
+        </div>
       </div>
     </div>
   );
