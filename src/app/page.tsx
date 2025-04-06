@@ -1,161 +1,141 @@
-// Final $1000-level Launch Pad Demo
-"use client"
+'use client';
 
-import { useState } from 'react'
-import {
-  Mail,
-  Zap,
-  CheckCircle,
-  ShieldCheck,
-  Sparkles,
-  ArrowDownCircle,
-  Check
-} from 'lucide-react'
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import ValueOverlay from '@/components/ValueOverlay';
 
-export default function Home() {
-  const [email, setEmail] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-  const [showWhy, setShowWhy] = useState(false)
+export default function LaunchPadPage() {
+  const [showTop, setShowTop] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitted(true)
-  }
+  useEffect(() => {
+    const handleScroll = () => setShowTop(window.scrollY > 300);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <main className="bg-white text-black">
-      {/* Walkthrough Toggle */}
-      <button
-        onClick={() => setShowWhy(!showWhy)}
-        className="fixed bottom-6 right-6 z-50 px-4 py-2 rounded-full shadow-lg bg-black text-white text-sm font-medium hover:bg-black/90"
-      >
-        {showWhy ? 'Close Value Walkthrough' : 'Why This Costs $1,000?'}
-      </button>
-
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center justify-center px-6 py-32 overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-full w-full bg-gradient-to-br from-green-100 via-white to-transparent rounded-full blur-2xl opacity-30 -z-10" />
-        <div className="text-center max-w-2xl space-y-8">
-          <h1 className="text-5xl sm:text-6xl font-bold leading-tight">
-            Launch Bold. Convert Fast.
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-600">
-            The exact 1-page framework we use to help solo coaches launch new offers, grow lists, and validate their niche — in days, not weeks.
-          </p>
-          {submitted ? (
-            <div className="bg-green-50 border border-green-300 text-green-800 px-6 py-4 rounded-lg inline-flex items-center justify-center gap-2">
-              <Check className="w-5 h-5" />
-              <span className="font-medium">You&#39;re subscribed! Watch your inbox for launch access. 🚀</span>
-            </div>
-          ) : (
-            <form
-              onSubmit={handleSubmit}
-              className="flex flex-col sm:flex-row gap-3 justify-center max-w-lg mx-auto"
-            >
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-black"
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 rounded-md bg-black text-white font-medium hover:bg-black/90 flex items-center gap-2"
-              >
-                <Mail className="w-4 h-4" /> Notify Me
-              </button>
-            </form>
-          )}
-          <p className="text-sm text-gray-400 mt-2">No spam. Unsubscribe anytime. 🔒</p>
-        </div>
-      </section>
-
-      {/* Scroll Cue */}
-      <div className="py-4 text-center animate-bounce">
-        <ArrowDownCircle className="w-6 h-6 text-gray-400 mx-auto" />
+    <main className="bg-white text-gray-900">
+      {/* Demo Notice */}
+      <div className="fixed top-4 right-4 bg-gray-100 text-gray-600 text-sm px-3 py-1 rounded-full shadow">
+        🧪 This is a Demo Site Preview
       </div>
 
-      {/* Benefits Section */}
-      <section className="bg-gray-50 py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center space-y-10">
-          <h2 className="text-3xl sm:text-4xl font-bold">What You Get</h2>
-          <div className="grid sm:grid-cols-2 gap-8 text-left">
-            <div className="flex items-start gap-4">
-              <Zap className="w-6 h-6 text-green-600 mt-1" />
-              <div>
-                <h3 className="text-lg font-semibold">Conversion-First Layout</h3>
-                <p className="text-gray-600">Designed with copy hierarchy, trust triggers, and optimized CTAs to drive real signups.</p>
+      {/* Hero */}
+      <section id="main-cta" className="relative bg-blue-50 py-24 px-6 text-center overflow-hidden">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-4xl md:text-5xl font-bold text-blue-900 max-w-3xl mx-auto"
+        >
+          This Could Be the Launchpad for Your Next Offer
+        </motion.h1>
+        <p className="mt-4 text-lg text-gray-700">
+          A high-converting landing page designed for coaches validating a new offer or lead magnet.
+        </p>
+        <a
+          href="https://launch-pad-demo.vercel.app"
+          target="_blank"
+          className="mt-8 inline-block px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold shadow-lg ring-2 ring-blue-300 animate-pulse"
+        >
+          View the Demo Site Preview
+        </a>
+      </section>
+
+      {/* Lead Magnet */}
+      <section id="lead-magnet" className="py-20 px-6 md:px-16 text-center bg-white">
+        <h2 className="text-3xl font-semibold mb-6">Offer a Free Lead Magnet — Like This</h2>
+        <p className="text-gray-700 max-w-xl mx-auto mb-8">
+          Use your site to give away a PDF, checklist, or video in exchange for emails. Here’s how that could look.
+        </p>
+        <img
+          src="/images/lead-magnet.png"
+          alt="Lead magnet preview"
+          className="mx-auto max-w-md rounded-xl shadow-md"
+        />
+      </section>
+
+      {/* Features */}
+      <section id="features" className="bg-gray-50 py-20 px-6 md:px-16">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-3xl font-semibold mb-12">What’s Included in This Package</h2>
+          <div className="grid md:grid-cols-3 gap-8 text-left">
+            {[
+              '1-page layout tailored for high conversions',
+              'Email capture section integrated with Mailchimp',
+              'Fully mobile-optimized with CTA buttons throughout',
+            ].map((feature, i) => (
+              <div key={i} className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+                <h3 className="text-xl font-medium">{feature}</h3>
               </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <ShieldCheck className="w-6 h-6 text-green-600 mt-1" />
-              <div>
-                <h3 className="text-lg font-semibold">Fully Mobile Responsive</h3>
-                <p className="text-gray-600">Perfect viewing experience across phones, tablets, and desktop — no scroll hacks needed.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <CheckCircle className="w-6 h-6 text-green-600 mt-1" />
-              <div>
-                <h3 className="text-lg font-semibold">Built-In Email Capture</h3>
-                <p className="text-gray-600">Includes setup for ConvertKit/Mailchimp, so you're collecting leads from day one.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <Sparkles className="w-6 h-6 text-green-600 mt-1" />
-              <div>
-                <h3 className="text-lg font-semibold">Deploys in Minutes</h3>
-                <p className="text-gray-600">Set up with Next.js + Vercel. No backend, no tech skills needed. It just works.</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Social Proof Section */}
-      <section className="py-20 bg-white px-6 text-center">
-        <div className="max-w-3xl mx-auto space-y-4">
-          <p className="text-sm uppercase tracking-widest text-gray-500">Used by Experts</p>
-          <h3 className="text-2xl font-bold">
-            This exact layout has powered 40+ high-converting launches for solo coaches and consultants.
-          </h3>
+      {/* Social Proof */}
+      <section id="social-proof" className="py-20 px-6 md:px-16 text-center bg-white">
+        <h2 className="text-2xl font-semibold mb-4">Trusted Frameworks for Real Coaches</h2>
+        <p className="text-gray-600 max-w-xl mx-auto mb-6">
+          This layout draws from proven marketing principles used by 7-figure coaching brands.
+        </p>
+        <div className="flex flex-wrap justify-center gap-4">
+          {['Forbes', 'CoachHub', 'LinkedIn Learning'].map((brand, i) => (
+            <span key={i} className="text-gray-500 text-lg">{brand}</span>
+          ))}
         </div>
       </section>
 
-      {/* Walkthrough Highlights */}
-      {showWhy && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40">
-          {/* Hero */}
-          <div className="absolute top-[22%] left-[10%] w-64 p-4 bg-white text-black rounded-xl shadow-xl">
-            <p className="font-semibold">🔥 Premium Headline</p>
-            <p className="text-sm">Emotional, results-driven headline built for top-of-funnel trust.</p>
+      {/* FAQ */}
+      <section id="faq" className="bg-blue-50 py-20 px-6 md:px-16">
+        <h2 className="text-3xl font-semibold text-center mb-10">About This Demo Site</h2>
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div>
+            <h3 className="font-semibold text-lg">Can I get this exact layout for my business?</h3>
+            <p className="text-gray-700">Yes! This is part of our Launch Pad Website package for coaches.</p>
           </div>
-          <div className="absolute top-[18%] left-[48%] w-20 h-20 border-2 border-green-400 rounded-full animate-ping"></div>
-
-          {/* Form */}
-          <div className="absolute top-[34%] left-[10%] w-64 p-4 bg-white text-black rounded-xl shadow-xl">
-            <p className="font-semibold">📩 Optimized Signup</p>
-            <p className="text-sm">Input spacing + CTA tested for clarity, speed, and frictionless flow.</p>
+          <div>
+            <h3 className="font-semibold text-lg">How customizable is this?</h3>
+            <p className="text-gray-700">Fonts, colors, content, and email integrations are all personalized to your brand.</p>
           </div>
-          <div className="absolute top-[32%] left-[50%] w-20 h-20 border-2 border-blue-400 rounded-full animate-pulse"></div>
-
-          {/* Features */}
-          <div className="absolute top-[67%] left-[10%] w-64 p-4 bg-white text-black rounded-xl shadow-xl">
-            <p className="font-semibold">📦 Real Business Value</p>
-            <p className="text-sm">Every feature saves time, increases conversions, or builds trust. It’s a system.</p>
+          <div>
+            <h3 className="font-semibold text-lg">Is this really just $500–$1,000?</h3>
+            <p className="text-gray-700">Yes. This exact site structure is what you get at that price — mobile-ready and launchable in days.</p>
           </div>
-          <div className="absolute top-[64%] left-[47%] w-24 h-24 border-2 border-yellow-400 rounded-full animate-spin"></div>
-
-          {/* Proof */}
-          <div className="absolute bottom-[8%] left-[10%] w-64 p-4 bg-white text-black rounded-xl shadow-xl">
-            <p className="font-semibold">💬 Launch Proven</p>
-            <p className="text-sm">Built with real data from 40+ launches — this isn’t theory.</p>
-          </div>
-          <div className="absolute bottom-[6%] left-[46%] w-16 h-16 border-2 border-pink-400 rounded-full animate-bounce"></div>
         </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-blue-700 text-white py-16 px-6 text-center">
+        <h2 className="text-3xl font-bold mb-4">Launch Your Site Today</h2>
+        <p className="mb-6 text-lg">Everything you need to validate your offer and grow your list.</p>
+        <a
+          href="https://launch-pad-demo.vercel.app"
+          target="_blank"
+          className="inline-block bg-white text-blue-700 px-6 py-3 rounded-full font-semibold shadow hover:bg-gray-100"
+        >
+          View Demo
+        </a>
+      </section>
+
+      {/* Back to Top */}
+      {showTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg"
+          aria-label="Back to top"
+        >
+          ↑
+        </button>
       )}
+
+      {/* Value Overlay Toggle */}
+      <ValueOverlay />
+
+      {/* Footer */}
+      <footer className="py-8 text-center text-sm text-gray-500 bg-gray-100">
+        &copy; 2025 NPR Media. All rights reserved.
+      </footer>
     </main>
-  )
+  );
 }
