@@ -9,13 +9,13 @@ type Highlight = {
 };
 
 export const launchPadHighlights: Highlight[] = [
-  { id: 'main-cta', message: 'This above-the-fold hero is designed to convert instantly with optimized visual hierarchy.' },
-  { id: 'lead-magnet', message: 'Lead capture system ready to integrate with Mailchimp or ConvertKit for list building.' },
-  { id: 'features', message: 'Strategic feature layout visually communicates core deliverables of the $1,000 package.' },
-  { id: 'testimonials', message: 'Real social proof slider with client results builds instant trust and lowers objections.' },
-  { id: 'social-proof', message: 'Frameworks and platforms trusted by top-tier coaches — immediate trust builder.' },
-  { id: 'faq', message: 'Anticipates and answers objections directly — critical for closing high-intent leads.' },
-  { id: 'cta-footer', message: 'Closes strong with a final CTA, price reiteration, and urgency — built to convert.' },
+  { id: 'main-cta', message: '📣 Instantly grabs attention with a conversion-optimized hero.' },
+  { id: 'lead-magnet', message: '🧲 Smart lead capture setup that grows your list fast.' },
+  { id: 'features', message: '🚀 Clear value prop layout that speaks ROI.' },
+  { id: 'testimonials', message: '🌟 Real results and trust-building social proof.' },
+  { id: 'social-proof', message: '🔒 Trusted by top-tier tools and frameworks.' },
+  { id: 'faq', message: '💬 Answers objections before they’re even asked.' },
+  { id: 'cta-footer', message: '✅ Strong final CTA designed to convert now.' },
 ];
 
 type Props = {
@@ -41,7 +41,7 @@ export default function ValueOverlay({ highlights }: Props) {
       const rect = section.getBoundingClientRect();
       const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2 - rect.height / 2);
       window.scrollTo({ top: offsetTop, behavior: 'smooth' });
-      await delay(2200);
+      await delay(3800);
     }
 
     setCurrent(-1);
@@ -119,7 +119,7 @@ export default function ValueOverlay({ highlights }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.4 }}
-                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001]"
+                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-semibold px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001] animate-pulse"
               >
                 {message}
               </motion.div>
