@@ -9,34 +9,13 @@ type Highlight = {
 };
 
 export const launchPadHighlights: Highlight[] = [
-  {
-    id: 'main-cta',
-    message: 'This above-the-fold hero is designed to convert instantly with optimized visual hierarchy.',
-  },
-  {
-    id: 'lead-magnet',
-    message: 'Lead capture system ready to integrate with Mailchimp or ConvertKit for list building.',
-  },
-  {
-    id: 'features',
-    message: 'Strategic feature layout visually communicates core deliverables of the $1,000 package.',
-  },
-  {
-    id: 'testimonials',
-    message: 'Real social proof slider with client results builds instant trust and lowers objections.',
-  },
-  {
-    id: 'social-proof',
-    message: 'Frameworks and platforms trusted by top-tier coaches — immediate trust builder.',
-  },
-  {
-    id: 'faq',
-    message: 'Anticipates and answers objections directly — critical for closing high-intent leads.',
-  },
-  {
-    id: 'cta-footer',
-    message: 'Closes strong with a final CTA, price reiteration, and urgency — built to convert.',
-  }
+  { id: 'main-cta', message: 'This above-the-fold hero is designed to convert instantly with optimized visual hierarchy.' },
+  { id: 'lead-magnet', message: 'Lead capture system ready to integrate with Mailchimp or ConvertKit for list building.' },
+  { id: 'features', message: 'Strategic feature layout visually communicates core deliverables of the $1,000 package.' },
+  { id: 'testimonials', message: 'Real social proof slider with client results builds instant trust and lowers objections.' },
+  { id: 'social-proof', message: 'Frameworks and platforms trusted by top-tier coaches — immediate trust builder.' },
+  { id: 'faq', message: 'Anticipates and answers objections directly — critical for closing high-intent leads.' },
+  { id: 'cta-footer', message: 'Closes strong with a final CTA, price reiteration, and urgency — built to convert.' },
 ];
 
 type Props = {
@@ -63,42 +42,27 @@ export default function ValueOverlay({ highlights }: Props) {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
   };
 
-  const scrollToHighlight = async (index: number) => {
-    const target = document.getElementById(highlights[index].id);
-    const section = target?.closest('section') || target;
-    if (!section) return;
-
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    return new Promise<void>((resolve) => {
-      const delay = setTimeout(() => {
-        resolve();
-      }, 2200);
-      timeoutRef.current = delay as unknown as NodeJS.Timeout;
-    });
-  };
+  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   const startGuidedScroll = async () => {
-    if (scrolling) {
-      stopScroll();
-      return;
-    }
+    if (scrolling) return stopScroll();
     setActive(true);
     setScrolling(true);
+    setCurrent(0);
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    await new Promise(resolve => setTimeout(resolve, 400));
-    if (scrolling) {
-      stopScroll();
-      return;
-    }
-    setActive(true);
-    setScrolling(true);
+    await delay(400);
 
     for (let i = 0; i < highlights.length; i++) {
-      setCurrent(i);
-      await scrollToHighlight(i);
       if (!scrolling) break;
+
+      const el = document.getElementById(highlights[i].id);
+      const section = el?.closest('section') || el;
+      if (!section) continue;
+
+      setCurrent(i);
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      await delay(2200);
     }
 
     setScrolling(false);
@@ -106,6 +70,7 @@ export default function ValueOverlay({ highlights }: Props) {
 
   return (
     <>
+      {/* Dimmed Background */}
       <AnimatePresence>
         {active && (
           <motion.div
@@ -118,6 +83,7 @@ export default function ValueOverlay({ highlights }: Props) {
         )}
       </AnimatePresence>
 
+      {/* Toggle Button */}
       <div className="fixed bottom-0 right-0 z-[1000] p-4">
         <button
           onClick={startGuidedScroll}
@@ -127,6 +93,7 @@ export default function ValueOverlay({ highlights }: Props) {
         </button>
       </div>
 
+      {/* Overlay Highlight */}
       <AnimatePresence>
         {active && current >= 0 && (() => {
           const { id, message } = highlights[current];
@@ -142,7 +109,7 @@ export default function ValueOverlay({ highlights }: Props) {
           return (
             <motion.div
               key={id}
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
@@ -162,10 +129,11 @@ export default function ValueOverlay({ highlights }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.4 }}
-                className="absolute top-full mt-3 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001]">
+                className="absolute top-full mt-3 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001]"
+              >
                 {message}
               </motion.div>
-              </motion.div>
+            </motion.div>
           );
         })()}
       </AnimatePresence>
