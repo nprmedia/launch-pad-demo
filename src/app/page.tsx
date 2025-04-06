@@ -116,6 +116,7 @@ export default function LaunchPadPage() {
       </motion.section>
 
       <motion.section
+        id="social-proof"
         className="w-full py-20 px-4 sm:px-6 text-center bg-indigo-900"
         variants={fadeUp}
         initial="hidden"
