@@ -32,7 +32,7 @@ export default function LaunchPadPage() {
   ];
 
   return (
-    <main className={`${inter.className} bg-white text-gray-900 overflow-x-hidden w-full max-w-full`}>
+    <main className={`${inter.className} bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white overflow-x-hidden w-full max-w-full`}>
       <ValueOverlay highlights={launchPadHighlights} />
 
       {/* Hero */}
@@ -42,10 +42,10 @@ export default function LaunchPadPage() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        className="relative min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 text-center bg-gradient-to-br from-blue-50 to-blue-100"
+        className="relative min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 text-center bg-gradient-to-br from-violet-900/80 to-indigo-900/80"
       >
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-blue-200 to-transparent blur-3xl opacity-30"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-500/20 to-transparent blur-2xl opacity-40"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.5 }}
@@ -54,46 +54,37 @@ export default function LaunchPadPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className={`${playfair.className} text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-blue-900 max-w-3xl leading-tight`}
+          className={`${playfair.className} text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white max-w-3xl leading-tight`}
         >
-          Your Coaching Launch Page, Done Right
+          Your Coaching Launch Page, Reimagined
         </motion.h1>
-        <p className="mt-4 text-balance text-base sm:text-lg text-gray-700 max-w-xl">
+        <p className="mt-4 text-balance text-base sm:text-lg text-white/80 max-w-xl">
           Built to convert leads, capture emails, and validate your next coaching offer.
         </p>
         <a
           href="https://launch-pad-demo.vercel.app"
           target="_blank"
-          className="group mt-8 inline-block px-6 sm:px-8 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-lg font-semibold shadow-xl ring-2 ring-blue-400 ring-offset-2 transition duration-200 relative overflow-hidden"
+          className="group mt-8 inline-block px-6 sm:px-8 py-3 rounded-full bg-white text-indigo-700 text-base sm:text-lg font-semibold shadow-xl ring-2 ring-indigo-300 ring-offset-2 hover:scale-105 transition duration-200"
         >
           <span className="relative z-10">🚀 Preview the Full Site</span>
-          <span className="absolute inset-0 rounded-full group-hover:scale-105 transition-transform duration-300 ring-2 ring-white/40" />
         </a>
-        <div className="absolute bottom-4 animate-bounce text-blue-600 text-sm">↓ Scroll for Features</div>
+        <div className="absolute bottom-4 animate-bounce text-indigo-300 text-sm">↓ Scroll for Features</div>
       </motion.section>
 
       {/* Lead Magnet */}
       <motion.section
         id="lead-magnet"
-        className="py-24 px-4 sm:px-6 md:px-16 bg-gradient-to-br from-white to-blue-50 flex flex-col md:flex-row items-center gap-12 max-w-7xl mx-auto"
+        className="py-24 px-4 sm:px-6 md:px-16 bg-indigo-950 text-white flex flex-col md:flex-row items-center gap-12 max-w-7xl mx-auto"
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
       >
-        <Image
-          src="/images/lead-magnet.png"
-          alt="Lead magnet mockup"
-          width={480}
-          height={320}
-          className="rounded-xl shadow-xl w-full md:w-auto"
-        />
+        <Image src="/images/lead-magnet.png" alt="Lead magnet mockup" width={480} height={320} className="rounded-xl shadow-xl w-full md:w-auto" />
         <div className="max-w-xl text-center md:text-left">
           <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Capture Emails with a Magnetic Giveaway</h2>
-          <p className="text-gray-700 mb-6 text-sm sm:text-base">
-            Offer a checklist, template, or guide — we build the exact section that gets subscribers.
-          </p>
-          <ul className="space-y-2 text-sm sm:text-base text-left">
+          <p className="text-white/80 mb-6 text-sm sm:text-base">Offer a checklist, template, or guide — we build the exact section that gets subscribers.</p>
+          <ul className="space-y-2 text-sm sm:text-base text-left text-white/90">
             <li>✅ Plug-and-play email capture</li>
             <li>✅ Mobile-first and lightning-fast</li>
             <li>✅ Mailchimp ready</li>
@@ -104,28 +95,24 @@ export default function LaunchPadPage() {
       {/* Features */}
       <motion.section
         id="features"
-        className="py-24 px-4 sm:px-6 md:px-16 bg-gradient-to-bl from-gray-50 to-white text-center max-w-6xl mx-auto"
+        className="py-24 px-4 sm:px-6 md:px-16 bg-gradient-to-bl from-[#1e293b] to-[#0f172a] text-center max-w-6xl mx-auto"
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold mb-12">What’s Included</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-12 text-white">What’s Included</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-          {[
-            { title: 'High-Conversion Layout', emoji: '📄', desc: 'Drives opt-ins and validates your offer.' },
-            { title: 'Email Marketing Integration', emoji: '📬', desc: 'Works with Mailchimp and ConvertKit.' },
-            { title: 'Mobile & Speed Optimized', emoji: '⚡', desc: 'Lightning-fast across all devices.' },
-          ].map((item) => (
+          {[{ title: 'High-Conversion Layout', emoji: '📄', desc: 'Drives opt-ins and validates your offer.' }, { title: 'Email Marketing Integration', emoji: '📬', desc: 'Works with Mailchimp and ConvertKit.' }, { title: 'Mobile & Speed Optimized', emoji: '⚡', desc: 'Lightning-fast across all devices.' }].map((item) => (
             <motion.div
               key={item.title}
               whileHover={{ scale: 1.05 }}
               transition={{ type: 'spring', stiffness: 300 }}
-              className="bg-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition border border-gray-100"
+              className="bg-white/5 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition border border-white/10"
             >
               <div className="text-4xl mb-4">{item.emoji}</div>
-              <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-              <p className="text-gray-600 text-sm">{item.desc}</p>
+              <h3 className="text-lg font-semibold mb-2 text-white/90">{item.title}</h3>
+              <p className="text-white/70 text-sm">{item.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -133,13 +120,13 @@ export default function LaunchPadPage() {
 
       {/* Testimonials */}
       <motion.section
-        className="py-20 px-4 sm:px-6 text-center max-w-3xl mx-auto"
+        className="py-20 px-4 sm:px-6 text-center max-w-3xl mx-auto bg-indigo-900"
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
       >
-        <h2 className="text-xl sm:text-2xl font-semibold mb-6">What Real Coaches Are Saying</h2>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-6 text-white">What Real Coaches Are Saying</h2>
         <div className="overflow-hidden relative">
           <motion.div
             className="flex"
@@ -149,35 +136,18 @@ export default function LaunchPadPage() {
           >
             {[...testimonials, ...testimonials].map((t, i) => (
               <div key={i} className="min-w-full px-4">
-                <blockquote className="text-lg italic text-gray-800">“{t.quote}”</blockquote>
-                <p className="mt-2 text-sm text-gray-600">— {t.name}</p>
+                <blockquote className="text-lg italic text-white/90">“{t.quote}”</blockquote>
+                <p className="mt-2 text-sm text-white/70">— {t.name}</p>
               </div>
             ))}
           </motion.div>
         </div>
       </motion.section>
 
-      {/* Social Proof */}
-      <motion.section
-        id="social-proof"
-        className="py-20 px-4 sm:px-6 text-center max-w-4xl mx-auto"
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-      >
-        <h2 className="text-xl sm:text-2xl font-semibold mb-4">Based on Frameworks Used by:</h2>
-        <div className="flex justify-center flex-wrap gap-6 opacity-60">
-          {['Forbes', 'CoachHub', 'LinkedIn Learning'].map((brand) => (
-            <span key={brand} className="text-base sm:text-lg">{brand}</span>
-          ))}
-        </div>
-      </motion.section>
-
       {/* FAQ */}
       <motion.section
         id="faq"
-        className="bg-blue-50 py-24 px-4 sm:px-6 md:px-16 max-w-3xl mx-auto"
+        className="bg-indigo-950 py-24 px-4 sm:px-6 md:px-16 max-w-3xl mx-auto text-white"
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
@@ -186,7 +156,7 @@ export default function LaunchPadPage() {
         <h2 className="text-xl sm:text-3xl font-semibold text-center mb-10">FAQ: Is This Really Worth $1,000?</h2>
         <div className="space-y-4">
           {faqs.map(({ q, a }, i) => (
-            <div key={q} className="border-b pb-4">
+            <div key={q} className="border-b border-white/10 pb-4">
               <button
                 className="w-full text-left font-semibold text-base sm:text-lg focus:outline-none flex justify-between items-center"
                 onClick={() => toggleFAQ(i)}
@@ -199,7 +169,7 @@ export default function LaunchPadPage() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="text-sm text-gray-700 mt-2"
+                  className="text-sm text-white/80 mt-2"
                 >
                   {a}
                 </motion.div>
@@ -212,7 +182,7 @@ export default function LaunchPadPage() {
       {/* CTA Footer */}
       <motion.section
         id="cta-footer"
-        className="bg-blue-700 text-white py-20 px-4 sm:px-6 text-center"
+        className="bg-indigo-800 text-white py-20 px-4 sm:px-6 text-center"
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
@@ -223,23 +193,23 @@ export default function LaunchPadPage() {
           Own this entire site for just $1,000 — ready in days, not weeks.
         </p>
         <div className="flex justify-center flex-wrap gap-4 mb-6">
-          <span className="bg-white text-blue-700 text-xs sm:text-sm px-3 py-1 rounded-full font-semibold">
+          <span className="bg-white text-indigo-800 text-xs sm:text-sm px-3 py-1 rounded-full font-semibold">
             ✅ 2-day Turnaround Included
           </span>
-          <span className="bg-white text-blue-700 text-xs sm:text-sm px-3 py-1 rounded-full font-semibold">
+          <span className="bg-white text-indigo-800 text-xs sm:text-sm px-3 py-1 rounded-full font-semibold">
             🎯 Built for Coaches & Consultants
           </span>
         </div>
         <a
           href="https://launch-pad-demo.vercel.app"
           target="_blank"
-          className="inline-block bg-white text-blue-700 px-6 py-3 rounded-full font-semibold shadow hover:bg-gray-100 transition"
+          className="inline-block bg-white text-indigo-800 px-6 py-3 rounded-full font-semibold shadow hover:bg-gray-100 transition"
         >
           Preview the Full Site
         </a>
       </motion.section>
 
-      <footer className="py-6 text-center text-sm text-gray-400 bg-gray-100">
+      <footer className="py-6 text-center text-sm text-white/40 bg-[#0f172a]">
         &copy; 2025 NPR Media. All rights reserved.
       </footer>
 
