@@ -3,130 +3,122 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type Highlight = {
-  id: string;
+interface Highlight {
+  targetId: string;
   message: string;
-};
+}
 
-export const launchPadHighlights: Highlight[] = [
-  { id: 'main-cta', message: '📣 Instantly grabs attention with a conversion-optimized hero.' },
-  { id: 'lead-magnet', message: '🧲 Smart lead capture setup that grows your list fast.' },
-  { id: 'features', message: '🚀 Clear value prop layout that speaks ROI.' },
-  { id: 'testimonials', message: '🌟 Real results and trust-building social proof.' },
-  { id: 'social-proof', message: '🔒 Trusted by top-tier tools and frameworks.' },
-  { id: 'faq', message: '💬 Answers objections before they’re even asked.' },
-  { id: 'cta-footer', message: '✅ Strong final CTA designed to convert now.' },
-];
-
-type Props = {
+interface Props {
   highlights: Highlight[];
-};
-
-export default function ValueOverlay({ highlights }: Props) {
-  const [current, setCurrent] = useState<number>(-1);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
-  const runWalkthrough = async () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    await delay(600);
-
-    for (let i = 0; i < highlights.length; i++) {
-      const el = document.getElementById(highlights[i].id);
-      const section = el?.closest('section') || el;
-      if (!section) continue;
-
-      setCurrent(i);
-      const rect = section.getBoundingClientRect();
-      const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2 - rect.height / 2);
-      window.scrollTo({ top: offsetTop, behavior: 'smooth' });
-      await delay(3800);
-    }
-
-    setCurrent(-1);
+  theme?: {
+    color?: string;
+    background?: string;
   };
+}
+
+export default function ValueOverlay({ highlights, theme }: Props) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [positions, setPositions] = useState<{ top: number; left: number; width: number; height: number }[]>([]);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const style = document.createElement('style');
-    style.innerHTML = 'body { overflow-x: hidden !important; }';
-    document.head.appendChild(style);
-    runWalkthrough();
-    return () => {
-      document.head.removeChild(style);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    const computePositions = () => {
+      const newPositions = highlights.map((highlight) => {
+        const el = document.getElementById(highlight.targetId);
+        if (!el) return { top: 0, left: 0, width: 0, height: 0 };
+        const rect = el.getBoundingClientRect();
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+        return {
+          top: rect.top + scrollTop,
+          left: rect.left + scrollLeft,
+          width: rect.width,
+          height: rect.height,
+        };
+      });
+      setPositions(newPositions);
     };
-  }, []);
+
+    computePositions();
+    window.addEventListener('resize', computePositions);
+    window.addEventListener('scroll', computePositions);
+    return () => {
+      window.removeEventListener('resize', computePositions);
+      window.removeEventListener('scroll', computePositions);
+    };
+  }, [highlights]);
+
+  useEffect(() => {
+    if (activeIndex === null || !positions[activeIndex]) return;
+    const { top } = positions[activeIndex];
+    window.scrollTo({ top: top - window.innerHeight / 2 + positions[activeIndex].height / 2, behavior: 'smooth' });
+  }, [activeIndex, positions]);
+
+  const color = theme?.color || 'indigo';
+  const background = theme?.background || 'white';
 
   return (
-    <>
-      {current === -1 && (
-        <div className="fixed bottom-4 right-4 z-[1001]">
-          <button
-            onClick={runWalkthrough}
-            className="px-4 py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 shadow-md"
-          >
-            🔁 Replay Value Highlights
-          </button>
-        </div>
-      )}
-      {/* Dimmed Background */}
+    <div ref={overlayRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
       <AnimatePresence>
-        {current >= 0 && (
+        {activeIndex !== null && positions[activeIndex] && (
           <motion.div
+            key={activeIndex}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="fixed inset-0 bg-black/40 z-[900]"
-          />
+            style={{
+              top: positions[activeIndex].top,
+              left: positions[activeIndex].left,
+              width: positions[activeIndex].width,
+              height: positions[activeIndex].height,
+            }}
+            className={`absolute border-4 border-${color}-500 rounded-xl bg-${color}-500/10 backdrop-blur-md p-4 pointer-events-none`}
+          >
+            <div className={`text-${background} text-sm font-medium text-center mt-auto absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] bg-${color}-700/80 px-4 py-2 rounded-md shadow-lg`}>
+              <div className={`w-3 h-3 rotate-45 bg-${color}-700 absolute -top-1 left-1/2 -translate-x-1/2`} />
+              {highlights[activeIndex].message}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Overlay Highlight */}
-      <AnimatePresence>
-        {current >= 0 && (() => {
-          const { id, message } = highlights[current];
-          const el = document.getElementById(id);
-          if (!el) return null;
-          const section = el.closest('section') || el;
-          const bounds = section.getBoundingClientRect();
-          const scrollTop = window.scrollY;
-          const scrollLeft = window.scrollX;
-          const top = bounds.top + scrollTop;
-          const left = bounds.left + scrollLeft;
-
-          return (
-            <motion.div
-              key={id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              style={{
-                position: 'absolute',
-                top,
-                left,
-                width: bounds.width,
-                height: bounds.height,
-                zIndex: 999,
-                pointerEvents: 'none',
-              }}
-            >
-              <div className="w-full h-full border-4 border-yellow-400 rounded-2xl shadow-xl animate-pulse" />
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.4 }}
-                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-semibold px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001] ring-2 ring-yellow-600 ring-offset-2 ring-offset-yellow-100 before:absolute before:-top-2 before:left-1/2 before:-translate-x-1/2 before:border-8 before:border-transparent before:border-b-yellow-400"
-              >
-                {message}
-              </motion.div>
-            </motion.div>
-          );
-        })()}
-      </AnimatePresence>
-    </>
+      <div className="fixed bottom-6 right-6 z-[200]">
+        <button
+          onClick={() => {
+            if (activeIndex === null) setActiveIndex(0);
+            else if (activeIndex < highlights.length - 1) setActiveIndex(activeIndex + 1);
+            else setActiveIndex(null);
+          }}
+          className={`bg-${color}-600 hover:bg-${color}-700 text-${background} px-4 py-2 rounded-full shadow-lg`}
+        >
+          {activeIndex === null ? 'Start Walkthrough' : activeIndex < highlights.length - 1 ? 'Next' : 'Finish'}
+        </button>
+      </div>
+    </div>
   );
 }
+
+// Example config to copy
+export const launchPadHighlights: Highlight[] = [
+  {
+    targetId: 'main-cta',
+    message: 'Your first impression section — hooks and converts above the fold.',
+  },
+  {
+    targetId: 'lead-magnet',
+    message: 'Capture emails instantly with a lead magnet CTA and visual mockup.',
+  },
+  {
+    targetId: 'features',
+    message: 'Feature list styled to communicate value clearly and fast.',
+  },
+  {
+    targetId: 'faq',
+    message: 'Handles objections before they happen — fast and scrollable.',
+  },
+  {
+    targetId: 'cta-footer',
+    message: 'Closes the loop with urgency and offer reinforcement.',
+  },
+];
