@@ -32,17 +32,16 @@ export default function LaunchPadPage() {
   ];
 
   return (
-    <main className={`${inter.className} bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white overflow-x-hidden w-full max-w-full`}>
+    <main className={`${inter.className} bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white overflow-x-hidden w-full`}>
       <ValueOverlay highlights={launchPadHighlights} />
 
-      {/* Hero */}
       <motion.section
         id="main-cta"
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        className="relative min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 text-center bg-gradient-to-br from-violet-900/80 to-indigo-900/80"
+        className="relative min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 text-center w-full bg-gradient-to-br from-violet-900/80 to-indigo-900/80"
       >
         <motion.div
           className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-500/20 to-transparent blur-2xl opacity-40"
@@ -71,17 +70,16 @@ export default function LaunchPadPage() {
         <div className="absolute bottom-4 animate-bounce text-indigo-300 text-sm">↓ Scroll for Features</div>
       </motion.section>
 
-      {/* Lead Magnet */}
       <motion.section
         id="lead-magnet"
-        className="py-24 px-4 sm:px-6 md:px-16 bg-indigo-950 text-white flex flex-col md:flex-row items-center gap-12 max-w-7xl mx-auto"
+        className="w-full py-24 px-4 sm:px-6 md:px-16 bg-indigo-950 text-white flex flex-col md:flex-row items-center gap-12"
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
       >
         <Image src="/images/lead-magnet.png" alt="Lead magnet mockup" width={480} height={320} className="rounded-xl shadow-xl w-full md:w-auto" />
-        <div className="max-w-xl text-center md:text-left">
+        <div className="w-full max-w-xl text-center md:text-left">
           <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Capture Emails with a Magnetic Giveaway</h2>
           <p className="text-white/80 mb-6 text-sm sm:text-base">Offer a checklist, template, or guide — we build the exact section that gets subscribers.</p>
           <ul className="space-y-2 text-sm sm:text-base text-left text-white/90">
@@ -92,10 +90,9 @@ export default function LaunchPadPage() {
         </div>
       </motion.section>
 
-      {/* Features */}
       <motion.section
         id="features"
-        className="py-24 px-4 sm:px-6 md:px-16 bg-gradient-to-bl from-[#1e293b] to-[#0f172a] text-center max-w-6xl mx-auto"
+        className="w-full py-24 px-4 sm:px-6 md:px-16 bg-gradient-to-bl from-[#1e293b] to-[#0f172a] text-center"
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
@@ -118,9 +115,8 @@ export default function LaunchPadPage() {
         </div>
       </motion.section>
 
-      {/* Testimonials */}
       <motion.section
-        className="py-20 px-4 sm:px-6 text-center max-w-3xl mx-auto bg-indigo-900"
+        className="w-full py-20 px-4 sm:px-6 text-center bg-indigo-900"
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
@@ -144,10 +140,9 @@ export default function LaunchPadPage() {
         </div>
       </motion.section>
 
-      {/* FAQ */}
       <motion.section
         id="faq"
-        className="bg-indigo-950 py-24 px-4 sm:px-6 md:px-16 max-w-3xl mx-auto text-white"
+        className="w-full bg-indigo-950 py-24 px-4 sm:px-6 md:px-16 text-white"
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
@@ -179,10 +174,9 @@ export default function LaunchPadPage() {
         </div>
       </motion.section>
 
-      {/* CTA Footer */}
       <motion.section
         id="cta-footer"
-        className="bg-indigo-800 text-white py-20 px-4 sm:px-6 text-center"
+        className="w-full bg-indigo-800 text-white py-20 px-4 sm:px-6 text-center"
         variants={fadeUp}
         initial="hidden"
         whileInView="show"
@@ -209,7 +203,7 @@ export default function LaunchPadPage() {
         </a>
       </motion.section>
 
-      <footer className="py-6 text-center text-sm text-white/40 bg-[#0f172a]">
+      <footer className="w-full py-6 text-center text-sm text-white/40 bg-[#0f172a]">
         &copy; 2025 NPR Media. All rights reserved.
       </footer>
 
