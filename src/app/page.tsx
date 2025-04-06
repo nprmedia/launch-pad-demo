@@ -1,218 +1,132 @@
 'use client';
 
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { Playfair_Display, Inter } from 'next/font/google';
-import ValueOverlay, { launchPadHighlights } from '@/components/ValueOverlay';
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '700'] });
-const inter = Inter({ subsets: ['latin'], weight: ['400', '600', '700'] });
+type Highlight = {
+  id: string;
+  message: string;
+};
 
-export default function LaunchPadPage() {
-  const [activeFAQ, setActiveFAQ] = useState<number | null>(null);
+export const launchPadHighlights: Highlight[] = [
+  { id: 'main-cta', message: 'This above-the-fold hero is designed to convert instantly with optimized visual hierarchy.' },
+  { id: 'lead-magnet', message: 'Lead capture system ready to integrate with Mailchimp or ConvertKit for list building.' },
+  { id: 'features', message: 'Strategic feature layout visually communicates core deliverables of the $1,000 package.' },
+  { id: 'testimonials', message: 'Real social proof slider with client results builds instant trust and lowers objections.' },
+  { id: 'social-proof', message: 'Frameworks and platforms trusted by top-tier coaches — immediate trust builder.' },
+  { id: 'faq', message: 'Anticipates and answers objections directly — critical for closing high-intent leads.' },
+  { id: 'cta-footer', message: 'Closes strong with a final CTA, price reiteration, and urgency — built to convert.' },
+];
 
-  const toggleFAQ = (index: number) => {
-    setActiveFAQ(activeFAQ === index ? null : index);
+type Props = {
+  highlights: Highlight[];
+};
+
+export default function ValueOverlay({ highlights }: Props) {
+  const [current, setCurrent] = useState<number>(-1);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  const runWalkthrough = async () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    await delay(600);
+
+    for (let i = 0; i < highlights.length; i++) {
+      const el = document.getElementById(highlights[i].id);
+      const section = el?.closest('section') || el;
+      if (!section) continue;
+
+      setCurrent(i);
+      const rect = section.getBoundingClientRect();
+      const offsetTop = rect.top + window.scrollY - (window.innerHeight / 2 - rect.height / 2);
+      window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+      await delay(2200);
+    }
+
+    setCurrent(-1);
   };
 
-  const faqs = [
-    {
-      q: 'Can I use this layout with my own content?',
-      a: 'Yes — everything is structured to be swappable and brandable to your business.',
-    },
-    {
-      q: 'How long does it take to launch?',
-      a: 'Typically 2–3 days. We handle the build, you just plug in your content.',
-    },
-    {
-      q: 'Is $1,000 the real price?',
-      a: 'This is the exact site you get. No surprise upsells — the value is in the execution.',
-    },
-  ];
-
-  const testimonials = [
-    {
-      quote: 'This site helped me collect 200+ leads in my first week. Highly recommend!',
-      name: 'Alex R., Career Coach',
-    },
-    {
-      quote: 'It looks and works better than $3,000 sites I’ve seen. Unreal quality.',
-      name: 'Maria S., Wellness Coach',
-    },
-    {
-      quote: 'It took 48 hours to go live. The design, copy, and speed were perfect.',
-      name: 'Jordan M., Mindset Consultant',
-    },
-  ];
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = 'body { overflow-x: hidden !important; }';
+    document.head.appendChild(style);
+    runWalkthrough();
+    return () => {
+      document.head.removeChild(style);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   return (
-    <main className={`${inter.className} bg-white text-gray-900 overflow-x-hidden`}>
-    <ValueOverlay highlights={launchPadHighlights} />
-
-      {/* Hero */}
-      <section
-        id="main-cta"
-        className="min-h-screen flex flex-col justify-center items-center px-6 text-center bg-gradient-to-br from-blue-50 to-blue-100 relative"
-      >
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className={`${playfair.className} text-5xl font-bold tracking-tight md:text-6xl text-blue-900 max-w-3xl`}
-        >
-          Your Coaching Launch Page, Done Right
-        </motion.h1>
-        <p className="mt-6 text-lg text-gray-700 max-w-xl">
-          Built to convert leads, capture emails, and validate your next coaching offer.
-        </p>
-        <a
-          href="https://launch-pad-demo.vercel.app"
-          target="_blank"
-          className="mt-8 inline-block px-8 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold shadow-lg ring-2 ring-blue-300"
-        >
-          Preview the Full Site
-        </a>
-        <div className="absolute bottom-4 animate-bounce text-blue-600 text-sm">↓ Scroll for Features</div>
-      </section>
-
-      {/* Lead Magnet Section */}
-      <section
-        id="lead-magnet"
-        className="py-24 px-6 md:px-16 bg-gradient-to-br from-white to-blue-50 flex flex-col md:flex-row items-center gap-12 max-w-7xl mx-auto"
-      >
-        <Image
-          src="/images/lead-magnet.png"
-          alt="Lead magnet mockup"
-          width={480}
-          height={320}
-          className="rounded-xl shadow-lg"
-        />
-        <div className="max-w-xl">
-          <h2 className="text-3xl font-semibold mb-4">Capture Emails with a Magnetic Giveaway</h2>
-          <p className="text-gray-700 mb-6">
-            Offer a checklist, template, or free guide — we build the exact section that gets subscribers.
-          </p>
-          <ul className="space-y-2 text-left">
-            <li>✅ Plug-and-play email capture</li>
-            <li>✅ Mobile-first and lightning-fast</li>
-            <li>✅ Mailchimp ready</li>
-          </ul>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section
-        id="features"
-        className="py-24 px-6 md:px-16 bg-gradient-to-bl from-gray-50 to-white text-center max-w-6xl mx-auto"
-      >
-        <h2 className="text-3xl font-bold mb-10">What’s Included</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              title: '1-Page High-Conversion Layout',
-              emoji: <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4h16v16H4z" /></svg>,
-              desc: 'Strategic layout designed to drive opt-ins and validate offers.',
-            },
-            {
-              title: 'Email Marketing Integration',
-              emoji: <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
-              desc: 'Pre-wired to work with Mailchimp and ConvertKit out of the box.',
-            },
-            {
-              title: 'Mobile & Speed Optimized',
-              emoji: <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>,
-              desc: 'Fast-loading and responsive across all devices for max performance.',
-            },
-          ].map(({ title, emoji, desc }) => (
-            <div
-              key={title}
-              className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition border border-gray-200"
-            >
-              <div className="text-4xl mb-2">{emoji}</div>
-              <h3 className="text-xl font-semibold mb-1">{title}</h3>
-              <p className="text-gray-600 text-sm">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Testimonial Carousel */}
-      <section className="py-16 px-6 text-center max-w-3xl mx-auto">
-        <h2 className="text-2xl font-semibold mb-6">What Real Coaches Are Saying</h2>
-        <div className="overflow-hidden relative">
-          <motion.div
-            className="flex"
-            initial={{ x: 0 }}
-            animate={{ x: ['0%', '-100%', '0%'] }}
-            transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+    <>
+      {current === -1 && (
+        <div className="fixed bottom-4 right-4 z-[1001]">
+          <button
+            onClick={runWalkthrough}
+            className="px-4 py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 shadow-md"
           >
-            {[...testimonials, ...testimonials].map((t, i) => (
-              <div key={i} className="min-w-full px-4">
-                <blockquote className="text-lg italic text-gray-800">“{t.quote}”</blockquote>
-                <p className="mt-2 text-sm text-gray-600">— {t.name}</p>
-              </div>
-            ))}
-          </motion.div>
+            🔁 Replay Value Highlights
+          </button>
         </div>
-      </section>
+      )}
+      {/* Dimmed Background */}
+      <AnimatePresence>
+        {current >= 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="fixed inset-0 bg-black/40 z-[900]"
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Social Proof */}
-      <section id="social-proof" className="py-16 px-6 text-center max-w-4xl mx-auto">
-        <h2 className="text-2xl font-semibold mb-4">Based on Frameworks Used by:</h2>
-        <div className="flex justify-center flex-wrap gap-6 opacity-60">
-          {['Forbes', 'CoachHub', 'LinkedIn Learning'].map((brand) => (
-            <span key={brand} className="text-lg">{brand}</span>
-          ))}
-        </div>
-      </section>
+      {/* Overlay Highlight */}
+      <AnimatePresence>
+        {current >= 0 && (() => {
+          const { id, message } = highlights[current];
+          const el = document.getElementById(id);
+          if (!el) return null;
+          const section = el.closest('section') || el;
+          const bounds = section.getBoundingClientRect();
+          const scrollTop = window.scrollY;
+          const scrollLeft = window.scrollX;
+          const top = bounds.top + scrollTop;
+          const left = bounds.left + scrollLeft;
 
-      {/* FAQ */}
-      <section id="faq" className="bg-blue-50 py-20 px-6 md:px-16 max-w-3xl mx-auto">
-        <h2 className="text-3xl font-semibold text-center mb-10">FAQ: Is This Really Worth $1,000?</h2>
-        <div className="space-y-4">
-          {faqs.map(({ q, a }, i) => (
-            <div key={q} className="border-b pb-4">
-              <button
-                className="w-full text-left font-semibold text-lg focus:outline-none"
-                onClick={() => toggleFAQ(i)}
+          return (
+            <motion.div
+              key={id}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              style={{
+                position: 'absolute',
+                top,
+                left,
+                width: bounds.width,
+                height: bounds.height,
+                zIndex: 999,
+                pointerEvents: 'none',
+              }}
+            >
+              <div className="w-full h-full border-4 border-yellow-400 rounded-2xl shadow-xl animate-pulse" />
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.4 }}
+                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001]"
               >
-                {q}
-              </button>
-              {activeFAQ === i && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="text-sm text-gray-700 mt-2"
-                >
-                  {a}
-                </motion.div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Footer */}
-      <section className="bg-blue-700 text-white py-16 px-6 text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Launch?</h2>
-        <p className="mb-6 text-lg">Own this entire site for just $1,000 — ready in days, not weeks.</p>
-        <a
-          href="https://launch-pad-demo.vercel.app"
-          target="_blank"
-          className="inline-block bg-white text-blue-700 px-6 py-3 rounded-full font-semibold shadow hover:bg-gray-100"
-        >
-          Preview the Full Site
-        </a>
-      </section>
-
-      {/* Micro Footer */}
-      <footer className="py-6 text-center text-sm text-gray-400 bg-gray-100">
-        &copy; 2025 NPR Media. All rights reserved.
-      </footer>
-      <SpeedInsights />
-    </main>
+                {message}
+              </motion.div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
+    </>
   );
 }
