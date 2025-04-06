@@ -72,8 +72,12 @@ export default function ValueOverlay({ highlights }: Props) {
     setCurrent(index);
     const el = document.getElementById(highlights[index].id);
     const section = el?.closest('section') || el;
-    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    timeoutRef.current = setTimeout(() => scrollStep(index + 1), 2400);
+    if (section) {
+  section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  timeoutRef.current = setTimeout(() => scrollStep(index + 1), 2600);
+  return;
+}
+    
   };
 
   const startGuidedScroll = () => {
