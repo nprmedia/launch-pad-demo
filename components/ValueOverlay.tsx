@@ -68,7 +68,7 @@ export default function ValueOverlay({ highlights }: Props) {
     const section = target?.closest('section') || target;
     if (!section) return;
 
-    section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     return new Promise<void>((resolve) => {
       const delay = setTimeout(() => {
@@ -87,7 +87,7 @@ export default function ValueOverlay({ highlights }: Props) {
     setScrolling(true);
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 400));
     if (scrolling) {
       stopScroll();
       return;
@@ -96,7 +96,6 @@ export default function ValueOverlay({ highlights }: Props) {
     setScrolling(true);
 
     for (let i = 0; i < highlights.length; i++) {
-      await scrollToHighlight(i);
       setCurrent(i);
       await scrollToHighlight(i);
       if (!scrolling) break;
