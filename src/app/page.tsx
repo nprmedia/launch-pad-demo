@@ -1,139 +1,159 @@
 'use client';
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 import ValueOverlay from '@/components/ValueOverlay';
 
 export default function LaunchPadPage() {
-  const [showTop, setShowTop] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setShowTop(window.scrollY > 300);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <main className="bg-white text-gray-900">
-      {/* Demo Notice */}
-      <div className="fixed top-4 right-4 bg-gray-100 text-gray-600 text-sm px-3 py-1 rounded-full shadow">
-        🧪 This is a Demo Site Preview
-      </div>
+      {/* Overlay Toggle */}
+      <ValueOverlay />
 
       {/* Hero */}
-      <section id="main-cta" className="relative bg-blue-50 py-24 px-6 text-center overflow-hidden">
+      <section
+        id="main-cta"
+        className="min-h-screen flex flex-col justify-center items-center px-6 text-center bg-gradient-to-br from-blue-50 to-blue-100 relative"
+      >
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-4xl md:text-5xl font-bold text-blue-900 max-w-3xl mx-auto"
+          className="text-5xl font-bold tracking-tight md:text-6xl text-blue-900 max-w-3xl"
         >
-          This Could Be the Launchpad for Your Next Offer
+          Your Coaching Launch Page, Done Right
         </motion.h1>
-        <p className="mt-4 text-lg text-gray-700">
-          A high-converting landing page designed for coaches validating a new offer or lead magnet.
+        <p className="mt-6 text-lg text-gray-700 max-w-xl">
+          Built to convert leads, capture emails, and validate your next coaching offer.
         </p>
         <a
           href="https://launch-pad-demo.vercel.app"
           target="_blank"
-          className="mt-8 inline-block px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold shadow-lg ring-2 ring-blue-300 animate-pulse"
+          className="mt-8 inline-block px-8 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold shadow-lg ring-2 ring-blue-300"
         >
-          View the Demo Site Preview
+          Preview the Full Site
         </a>
+        <div className="absolute bottom-4 animate-bounce text-blue-600 text-sm">↓ Scroll for Features</div>
       </section>
 
-      {/* Lead Magnet */}
-      <section id="lead-magnet" className="py-20 px-6 md:px-16 text-center bg-white">
-        <h2 className="text-3xl font-semibold mb-6">Offer a Free Lead Magnet — Like This</h2>
-        <p className="text-gray-700 max-w-xl mx-auto mb-8">
-          Use your site to give away a PDF, checklist, or video in exchange for emails. Here’s how that could look.
-        </p>
-        <img
+      {/* Lead Magnet Section */}
+      <section
+        id="lead-magnet"
+        className="py-24 px-6 md:px-16 bg-white flex flex-col md:flex-row items-center gap-12 max-w-7xl mx-auto"
+      >
+        <Image
           src="/images/lead-magnet.png"
-          alt="Lead magnet preview"
-          className="mx-auto max-w-md rounded-xl shadow-md"
+          alt="Lead magnet mockup"
+          width={480}
+          height={320}
+          className="rounded-xl shadow-lg"
         />
+        <div className="max-w-xl">
+          <h2 className="text-3xl font-semibold mb-4">Capture Emails with a Magnetic Giveaway</h2>
+          <p className="text-gray-700 mb-6">
+            Offer a checklist, template, or free guide — we build the exact section that gets subscribers.
+          </p>
+          <ul className="space-y-2 text-left">
+            <li>✅ Plug-and-play email capture</li>
+            <li>✅ Mobile-first and lightning-fast</li>
+            <li>✅ Mailchimp ready</li>
+          </ul>
+        </div>
       </section>
 
       {/* Features */}
-      <section id="features" className="bg-gray-50 py-20 px-6 md:px-16">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-3xl font-semibold mb-12">What’s Included in This Package</h2>
-          <div className="grid md:grid-cols-3 gap-8 text-left">
-            {[
-              '1-page layout tailored for high conversions',
-              'Email capture section integrated with Mailchimp',
-              'Fully mobile-optimized with CTA buttons throughout',
-            ].map((feature, i) => (
-              <div key={i} className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-                <h3 className="text-xl font-medium">{feature}</h3>
-              </div>
-            ))}
-          </div>
+      <section
+        id="features"
+        className="py-24 px-6 md:px-16 bg-gray-50 text-center max-w-6xl mx-auto"
+      >
+        <h2 className="text-3xl font-bold mb-10">What’s Included</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              title: '1-Page High-Conversion Layout',
+              emoji: '🧩',
+              desc: 'Strategic layout designed to drive opt-ins and validate offers.',
+            },
+            {
+              title: 'Email Marketing Integration',
+              emoji: '📬',
+              desc: 'Pre-wired to work with Mailchimp and ConvertKit out of the box.',
+            },
+            {
+              title: 'Mobile & Speed Optimized',
+              emoji: '⚡',
+              desc: 'Fast-loading and responsive across all devices for max performance.',
+            },
+          ].map(({ title, emoji, desc }) => (
+            <div
+              key={title}
+              className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition border border-gray-200"
+            >
+              <div className="text-4xl mb-2">{emoji}</div>
+              <h3 className="text-xl font-semibold mb-1">{title}</h3>
+              <p className="text-gray-600 text-sm">{desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Social Proof */}
-      <section id="social-proof" className="py-20 px-6 md:px-16 text-center bg-white">
-        <h2 className="text-2xl font-semibold mb-4">Trusted Frameworks for Real Coaches</h2>
-        <p className="text-gray-600 max-w-xl mx-auto mb-6">
-          This layout draws from proven marketing principles used by 7-figure coaching brands.
-        </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          {['Forbes', 'CoachHub', 'LinkedIn Learning'].map((brand, i) => (
-            <span key={i} className="text-gray-500 text-lg">{brand}</span>
+      <section
+        id="social-proof"
+        className="py-16 px-6 text-center max-w-4xl mx-auto"
+      >
+        <h2 className="text-2xl font-semibold mb-4">Based on Frameworks Used by:</h2>
+        <div className="flex justify-center flex-wrap gap-6 opacity-60">
+          {['Forbes', 'CoachHub', 'LinkedIn Learning'].map((brand) => (
+            <span key={brand} className="text-lg">{brand}</span>
           ))}
         </div>
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="bg-blue-50 py-20 px-6 md:px-16">
-        <h2 className="text-3xl font-semibold text-center mb-10">About This Demo Site</h2>
-        <div className="max-w-3xl mx-auto space-y-6">
-          <div>
-            <h3 className="font-semibold text-lg">Can I get this exact layout for my business?</h3>
-            <p className="text-gray-700">Yes! This is part of our Launch Pad Website package for coaches.</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg">How customizable is this?</h3>
-            <p className="text-gray-700">Fonts, colors, content, and email integrations are all personalized to your brand.</p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg">Is this really just $500–$1,000?</h3>
-            <p className="text-gray-700">Yes. This exact site structure is what you get at that price — mobile-ready and launchable in days.</p>
-          </div>
+      <section
+        id="faq"
+        className="bg-blue-50 py-20 px-6 md:px-16 max-w-3xl mx-auto"
+      >
+        <h2 className="text-3xl font-semibold text-center mb-10">FAQ: Is This Really Worth $1,000?</h2>
+        <div className="space-y-6">
+          {[
+            {
+              q: 'Can I use this layout with my own content?',
+              a: 'Yes — everything is structured to be swappable and brandable to your business.',
+            },
+            {
+              q: 'How long does it take to launch?',
+              a: 'Typically 2–3 days. We handle the build, you just plug in your content.',
+            },
+            {
+              q: 'Is $1,000 the real price?',
+              a: 'This is the exact site you get. No surprise upsells — the value is in the execution.',
+            },
+          ].map(({ q, a }) => (
+            <div key={q}>
+              <h3 className="font-semibold text-lg">{q}</h3>
+              <p className="text-gray-700 text-sm mt-1">{a}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA Footer */}
       <section className="bg-blue-700 text-white py-16 px-6 text-center">
-        <h2 className="text-3xl font-bold mb-4">Launch Your Site Today</h2>
-        <p className="mb-6 text-lg">Everything you need to validate your offer and grow your list.</p>
+        <h2 className="text-3xl font-bold mb-4">Ready to Launch?</h2>
+        <p className="mb-6 text-lg">Own this entire site for just $1,000 — ready in days, not weeks.</p>
         <a
           href="https://launch-pad-demo.vercel.app"
           target="_blank"
           className="inline-block bg-white text-blue-700 px-6 py-3 rounded-full font-semibold shadow hover:bg-gray-100"
         >
-          View Demo
+          Preview the Full Site
         </a>
       </section>
 
-      {/* Back to Top */}
-      {showTop && (
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg"
-          aria-label="Back to top"
-        >
-          ↑
-        </button>
-      )}
-
-      {/* Value Overlay Toggle */}
-      <ValueOverlay />
-
-      {/* Footer */}
-      <footer className="py-8 text-center text-sm text-gray-500 bg-gray-100">
+      {/* Micro Footer */}
+      <footer className="py-6 text-center text-sm text-gray-400 bg-gray-100">
         &copy; 2025 NPR Media. All rights reserved.
       </footer>
     </main>
