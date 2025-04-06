@@ -48,6 +48,7 @@ export default function ValueOverlay({ highlights }: Props) {
   const [scrolling, setScrolling] = useState(false);
   const [current, setCurrent] = useState<number>(-1);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const style = document.createElement('style');
@@ -70,8 +71,9 @@ export default function ValueOverlay({ highlights }: Props) {
     }
     setCurrent(index);
     const el = document.getElementById(highlights[index].id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    timeoutRef.current = setTimeout(() => scrollStep(index + 1), 2200);
+    const section = el?.closest('section') || el;
+    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    timeoutRef.current = setTimeout(() => scrollStep(index + 1), 2400);
   };
 
   const startGuidedScroll = () => {
@@ -94,7 +96,8 @@ export default function ValueOverlay({ highlights }: Props) {
             className="fixed inset-0 bg-black/40 z-[900]"
           />
         )}
-      </AnimatePresence> 
+      </AnimatePresence>
+
       <div className="fixed bottom-0 right-0 z-[1000] p-4">
         <button
           onClick={startGuidedScroll}
@@ -105,42 +108,42 @@ export default function ValueOverlay({ highlights }: Props) {
       </div>
 
       <AnimatePresence>
-        {active && current >= 0 &&
-          (() => {
-            const { id, message } = highlights[current];
-            const el = document.getElementById(id);
-            if (!el) return null;
-            const section = el.closest('section') || el;
-                        const scrollTop = window.scrollY;
-            const scrollLeft = window.scrollX;
-            const bounds = section.getBoundingClientRect();
-            const top = bounds.top + scrollTop;
-            const left = bounds.left + scrollLeft;
+        {active && current >= 0 && (() => {
+          const { id, message } = highlights[current];
+          const el = document.getElementById(id);
+          if (!el) return null;
+          const section = el.closest('section') || el;
+          const bounds = section.getBoundingClientRect();
+          const scrollTop = window.scrollY;
+          const scrollLeft = window.scrollX;
+          const top = bounds.top + scrollTop;
+          const left = bounds.left + scrollLeft;
 
-            return (
-              <motion.div
-                key={id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                style={{
-                  position: 'absolute',
-                  top: top - 12,
-                  left: left - 12,
-                  width: bounds.width + 24,
-                  height: bounds.height + 24,
-                  zIndex: 999,
-                  pointerEvents: 'none',
-                }}
-              >
-                <div className="w-full h-full border-4 border-yellow-400 rounded-2xl shadow-xl animate-pulse"></div>
-                <div className="absolute top-full mt-3 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001]">
-                  {message}
-                </div>
-              </motion.div>
-            );
-          })()}
+          return (
+            <motion.div
+              ref={overlayRef}
+              key={id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              style={{
+                position: 'absolute',
+                top,
+                left,
+                width: bounds.width,
+                height: bounds.height,
+                zIndex: 999,
+                pointerEvents: 'none',
+              }}
+            >
+              <div className="w-full h-full border-4 border-yellow-400 rounded-2xl shadow-xl animate-pulse" />
+              <div className="absolute top-full mt-3 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001]">
+                {message}
+              </div>
+            </motion.div>
+          );
+        })()}
       </AnimatePresence>
     </>
   );
