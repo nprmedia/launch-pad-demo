@@ -3,33 +3,14 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const highlights = [
-  {
-    id: 'cta',
-    selector: '#main-cta',
-    message: 'Conversion-optimized CTA built to drive action — not just decoration.',
-  },
-  {
-    id: 'lead-magnet',
-    selector: '#lead-magnet',
-    message: 'Designed to turn traffic into subscribers, not just look pretty.',
-  },
-  {
-    id: 'features',
-    selector: '#features',
-    message: 'Integrated features with mobile-first UX that drive ROI.',
-  },
-  {
-    id: 'social-proof',
-    selector: '#social-proof',
-    message: 'Trust-building layout inspired by 7-figure coaching sites.',
-  },
-  {
-    id: 'faq',
-    selector: '#faq',
-    message: 'Handles objections proactively — critical for conversions.',
-  },
-];
+type Highlight = {
+  id: string;
+  message: string;
+};
+
+type Props = {
+  highlights: Highlight[];
+};
 
 type HighlightPosition = {
   top: number;
@@ -38,15 +19,15 @@ type HighlightPosition = {
   height: number;
 };
 
-export default function ValueOverlay() {
+export default function ValueOverlay({ highlights }: Props) {
   const [active, setActive] = useState(false);
   const [positions, setPositions] = useState<Record<string, HighlightPosition>>({});
 
   useEffect(() => {
     if (active) {
       const newPos: Record<string, HighlightPosition> = {};
-      highlights.forEach(({ id, selector }) => {
-        const el = document.querySelector(selector);
+      highlights.forEach(({ id }) => {
+        const el = document.getElementById(id);
         if (el) {
           const rect = el.getBoundingClientRect();
           newPos[id] = {
@@ -61,7 +42,7 @@ export default function ValueOverlay() {
     } else {
       setPositions({});
     }
-  }, [active]);
+  }, [active, highlights]);
 
   return (
     <>
