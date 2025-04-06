@@ -22,6 +22,10 @@ export const launchPadHighlights: Highlight[] = [
     message: 'Strategic feature layout visually communicates core deliverables of the $1,000 package.',
   },
   {
+    id: 'testimonials',
+    message: 'Real social proof slider with client results builds instant trust and lowers objections.',
+  },
+  {
     id: 'social-proof',
     message: 'Frameworks and platforms trusted by top-tier coaches — immediate trust builder.',
   },
@@ -29,6 +33,10 @@ export const launchPadHighlights: Highlight[] = [
     id: 'faq',
     message: 'Anticipates and answers objections directly — critical for closing high-intent leads.',
   },
+  {
+    id: 'cta-footer',
+    message: 'Closes strong with a final CTA, price reiteration, and urgency — built to convert.',
+  }
 ];
 
 type Props = {
@@ -71,13 +79,22 @@ export default function ValueOverlay({ highlights }: Props) {
     setActive(true);
     setScrolling(true);
     setCurrent(0);
-    const el = document.getElementById(highlights[0].id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    timeoutRef.current = setTimeout(() => scrollStep(1), 2000);
+    scrollStep(0);
   };
 
   return (
     <>
+      <AnimatePresence>
+        {active && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="fixed inset-0 bg-black/40 z-[900]"
+          />
+        )}
+      </AnimatePresence> 
       <div className="fixed bottom-0 right-0 z-[1000] p-4">
         <button
           onClick={startGuidedScroll}
@@ -93,9 +110,10 @@ export default function ValueOverlay({ highlights }: Props) {
             const { id, message } = highlights[current];
             const el = document.getElementById(id);
             if (!el) return null;
+            const section = el.closest('section') || el;
                         const scrollTop = window.scrollY;
             const scrollLeft = window.scrollX;
-            const bounds = el.getBoundingClientRect();
+            const bounds = section.getBoundingClientRect();
             const top = bounds.top + scrollTop;
             const left = bounds.left + scrollLeft;
 
