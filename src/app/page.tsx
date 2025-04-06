@@ -47,8 +47,8 @@ export default function LaunchPadPage() {
   ];
 
   return (
-    <main className={`${inter.className} bg-white text-gray-900`}>
-      <ValueOverlay highlights={launchPadHighlights} />
+    <main className={`${inter.className} bg-white text-gray-900 overflow-x-hidden`}>
+    <ValueOverlay highlights={launchPadHighlights} />
 
       {/* Hero */}
       <section
