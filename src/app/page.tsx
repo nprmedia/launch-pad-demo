@@ -26,7 +26,7 @@ export default function Home() {
         {submitted ? (
           <div className="mt-8 bg-green-50 text-green-700 p-4 rounded-lg border border-green-200 flex items-center justify-center gap-2">
             <Check className="w-5 h-5" />
-            <span className="font-medium">You're subscribed! Watch your inbox for launch access. 🚀</span>
+            <span className="font-medium">You&apos;re subscribed! Watch your inbox for launch access. 🚀</span>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mt-8 flex flex-col sm:flex-row items-center gap-3 max-w-xl mx-auto">
