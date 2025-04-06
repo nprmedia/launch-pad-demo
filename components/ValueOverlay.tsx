@@ -48,7 +48,6 @@ export default function ValueOverlay({ highlights }: Props) {
   const [scrolling, setScrolling] = useState(false);
   const [current, setCurrent] = useState<number>(-1);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const overlayRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const style = document.createElement('style');
@@ -64,28 +63,46 @@ export default function ValueOverlay({ highlights }: Props) {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
   };
 
-  const scrollStep = (index: number) => {
-    if (!scrolling || index >= highlights.length) {
-      setScrolling(false);
-      return;
-    }
-    setCurrent(index);
-    const el = document.getElementById(highlights[index].id);
-    const section = el?.closest('section') || el;
-    if (section) {
-  section.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  timeoutRef.current = setTimeout(() => scrollStep(index + 1), 2600);
-  return;
-}
-    
+  const scrollToHighlight = async (index: number) => {
+    const target = document.getElementById(highlights[index].id);
+    const section = target?.closest('section') || target;
+    if (!section) return;
+
+    section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    return new Promise<void>((resolve) => {
+      const delay = setTimeout(() => {
+        resolve();
+      }, 2200);
+      timeoutRef.current = delay as unknown as NodeJS.Timeout;
+    });
   };
 
-  const startGuidedScroll = () => {
-    if (scrolling) return stopScroll();
+  const startGuidedScroll = async () => {
+    if (scrolling) {
+      stopScroll();
+      return;
+    }
     setActive(true);
     setScrolling(true);
-    setCurrent(0);
-    scrollStep(0);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    await new Promise(resolve => setTimeout(resolve, 800));
+    if (scrolling) {
+      stopScroll();
+      return;
+    }
+    setActive(true);
+    setScrolling(true);
+
+    for (let i = 0; i < highlights.length; i++) {
+      await scrollToHighlight(i);
+      setCurrent(i);
+      await scrollToHighlight(i);
+      if (!scrolling) break;
+    }
+
+    setScrolling(false);
   };
 
   return (
@@ -125,7 +142,6 @@ export default function ValueOverlay({ highlights }: Props) {
 
           return (
             <motion.div
-              ref={overlayRef}
               key={id}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -142,10 +158,15 @@ export default function ValueOverlay({ highlights }: Props) {
               }}
             >
               <div className="w-full h-full border-4 border-yellow-400 rounded-2xl shadow-xl animate-pulse" />
-              <div className="absolute top-full mt-3 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001]">
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.4 }}
+                className="absolute top-full mt-3 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 text-sm font-medium px-4 py-2 rounded shadow-lg max-w-xs text-center z-[1001]">
                 {message}
-              </div>
-            </motion.div>
+              </motion.div>
+              </motion.div>
           );
         })()}
       </AnimatePresence>
