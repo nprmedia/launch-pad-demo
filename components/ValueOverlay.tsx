@@ -16,6 +16,33 @@ interface Props {
   };
 }
 
+export const launchPadHighlights: Highlight[] = [
+  {
+    targetId: 'main-cta',
+    message: 'Your first impression section — hooks and converts above the fold.',
+  },
+  {
+    targetId: 'lead-magnet',
+    message: 'Capture emails instantly with a lead magnet CTA and visual mockup.',
+  },
+  {
+    targetId: 'features',
+    message: 'Feature list styled to communicate value clearly and fast.',
+  },
+  {
+    targetId: 'social-proof',
+    message: 'Trust-building layout inspired by 7-figure coaching sites.',
+  },
+  {
+    targetId: 'faq',
+    message: 'Handles objections before they happen — fast and scrollable.',
+  },
+  {
+    targetId: 'cta-footer',
+    message: 'Closes the loop with urgency and offer reinforcement.',
+  },
+];
+
 export default function ValueOverlay({ highlights, theme }: Props) {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [positions, setPositions] = useState<{ top: number; left: number; width: number; height: number }[]>([]);
@@ -49,11 +76,12 @@ export default function ValueOverlay({ highlights, theme }: Props) {
       setIsReady(true);
     };
 
-    setTimeout(computePositions, 200); // give DOM time to layout
+    const delay = setTimeout(computePositions, 250);
     window.addEventListener('resize', computePositions);
     window.addEventListener('scroll', handleInterrupt);
     window.addEventListener('keydown', handleKeyNav);
     return () => {
+      clearTimeout(delay);
       window.removeEventListener('resize', computePositions);
       window.removeEventListener('scroll', handleInterrupt);
       window.removeEventListener('keydown', handleKeyNav);
@@ -63,12 +91,13 @@ export default function ValueOverlay({ highlights, theme }: Props) {
   useEffect(() => {
     if (!isReady || activeIndex >= highlights.length || !positions[activeIndex]) return;
     const { top } = positions[activeIndex];
-    setTimeout(() => {
+    const scrollToHighlight = () => {
       window.scrollTo({
         top: top - window.innerHeight / 2 + positions[activeIndex].height / 2,
         behavior: 'smooth',
       });
-    }, 150);
+    };
+    requestAnimationFrame(scrollToHighlight);
 
     if (autoplay && !interrupted) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -110,7 +139,10 @@ export default function ValueOverlay({ highlights, theme }: Props) {
     setInterrupted(false);
   };
 
-  if (!isReady || activeIndex >= highlights.length) return null;
+  if (!isReady || activeIndex >= highlights.length) {
+    console.warn('Overlay skipped: no highlight ready or end of steps.');
+    return null;
+  }
 
   const current = positions[activeIndex];
 
@@ -129,7 +161,7 @@ export default function ValueOverlay({ highlights, theme }: Props) {
               top: current.top,
               left: current.left,
               width: current.width,
-              height: current.height,
+              height: current.height + 32,
             }}
             className={`absolute border-4 border-${color}-500 rounded-xl bg-transparent p-4 pointer-events-none transition-all duration-500`}
           >
@@ -196,30 +228,3 @@ export default function ValueOverlay({ highlights, theme }: Props) {
     </div>
   );
 }
-
-export const launchPadHighlights: Highlight[] = [
-  {
-    targetId: 'main-cta',
-    message: 'Your first impression section — hooks and converts above the fold.',
-  },
-  {
-    targetId: 'lead-magnet',
-    message: 'Capture emails instantly with a lead magnet CTA and visual mockup.',
-  },
-  {
-    targetId: 'features',
-    message: 'Feature list styled to communicate value clearly and fast.',
-  },
-  {
-    targetId: 'social-proof',
-    message: 'Trust-building layout inspired by 7-figure coaching sites.',
-  },
-  {
-    targetId: 'faq',
-    message: 'Handles objections before they happen — fast and scrollable.',
-  },
-  {
-    targetId: 'cta-footer',
-    message: 'Closes the loop with urgency and offer reinforcement.',
-  },
-];
