@@ -64,6 +64,10 @@ export default function LaunchPadPage() {
           console.warn(`Missing element for highlight: ${h.targetId}`);
         }
         const rect = el?.getBoundingClientRect();
+  
+        // Log the bounding rect
+        console.log(`Section ${h.targetId} coordinates:`, rect);
+  
         return {
           ...h,
           coordinates: rect
@@ -83,17 +87,16 @@ export default function LaunchPadPage() {
       });
       setHighlights(dynamicHighlights);
     };
-
+  
     setTimeout(() => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(compute);
-      });
+      requestAnimationFrame(compute);
     }, 300);
-    
+  
     const handleResize = () => requestAnimationFrame(compute);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+  
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null);
   const toggleFAQ = (index: number) => setActiveFAQ(activeFAQ === index ? null : index);
 
