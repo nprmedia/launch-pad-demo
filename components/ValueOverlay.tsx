@@ -6,6 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface Highlight {
   targetId: string;
   message: string;
+  coordinates: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
 }
 
 interface Props {
@@ -18,12 +24,6 @@ interface Props {
 
 export default function ValueOverlay({ highlights, theme }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [positions, setPositions] = useState<{
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  }[]>([]);
   const [autoplay, setAutoplay] = useState(true);
   const [interrupted, setInterrupted] = useState(false);
   const [lastScrollY, setLastScrollY] = useState<number>(0);
@@ -33,48 +33,6 @@ export default function ValueOverlay({ highlights, theme }: Props) {
 
   const color = theme?.color || 'indigo';
   const background = theme?.background || 'white';
-
-  // Calculate positions
-  useEffect(() => {
-    const computePositions = () => {
-      const updated = highlights.map((highlight) => {
-        const el = document.getElementById(highlight.targetId);
-        if (!el) return { top: 0, left: 0, width: 300, height: 200 };
-        const rect = el.getBoundingClientRect();
-        return {
-          top: rect.top + window.scrollY,
-          left: rect.left + window.scrollX,
-          width: rect.width || 300,
-          height: rect.height || 200,
-        };
-      });
-      setPositions(updated);
-    };
-
-    setTimeout(computePositions, 300);
-    window.addEventListener('resize', computePositions);
-    window.addEventListener('scroll', handleScrollInterrupt);
-    return () => {
-      window.removeEventListener('resize', computePositions);
-      window.removeEventListener('scroll', handleScrollInterrupt);
-    };
-  }, [highlights]);
-
-  useEffect(() => {
-    if (!positions[activeIndex]) return;
-    const { top, height } = positions[activeIndex];
-    window.scrollTo({
-      top: top - window.innerHeight / 2 + height / 2,
-      behavior: 'smooth',
-    });
-
-    if (autoplay && !interrupted) {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => {
-        if (activeIndex < highlights.length - 1) setActiveIndex((prev) => prev + 1);
-      }, 4000);
-    }
-  }, [activeIndex, positions, autoplay, interrupted, highlights.length]);
 
   const handleScrollInterrupt = () => {
     const currentY = window.scrollY;
@@ -86,19 +44,32 @@ export default function ValueOverlay({ highlights, theme }: Props) {
     setLastScrollY(currentY);
   };
 
-  const handleReplay = () => {
-    setActiveIndex(0);
-    setAutoplay(true);
-    setInterrupted(false);
-  };
+  useEffect(() => {
+    window.addEventListener('scroll', handleScrollInterrupt);
+    return () => window.removeEventListener('scroll', handleScrollInterrupt);
+  }, [autoplay]);
 
-  const handleToggleAutoplay = () => {
-    setAutoplay((prev) => !prev);
-    setInterrupted(false);
-  };
+  useEffect(() => {
+    if (!highlights[activeIndex]) return;
+    const { top, height } = highlights[activeIndex].coordinates;
 
-  if (!positions[activeIndex]) return null;
-  const current = positions[activeIndex];
+    setTimeout(() => {
+      window.scrollTo({
+        top: top - window.innerHeight / 2 + height / 2,
+        behavior: 'smooth',
+      });
+    }, 100);
+
+    if (autoplay && !interrupted) {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        if (activeIndex < highlights.length - 1) setActiveIndex((prev) => prev + 1);
+      }, 4000);
+    }
+  }, [activeIndex, autoplay, interrupted, highlights]);
+
+  if (!highlights.length || !highlights[activeIndex]) return null;
+  const current = highlights[activeIndex].coordinates;
 
   return (
     <div ref={overlayRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
@@ -112,12 +83,13 @@ export default function ValueOverlay({ highlights, theme }: Props) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           style={{
-            top: current.top,
+            position: 'absolute',
+            top: window.innerHeight / 2 - current.height / 2,
             left: current.left,
             width: current.width,
             height: current.height,
           }}
-          className={`absolute border-4 border-${color}-500 rounded-xl bg-transparent pointer-events-none`}
+          className={`border-4 border-${color}-500 rounded-xl bg-transparent pointer-events-none`}
         >
           <div
             className={`absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] px-4 py-2 text-sm font-medium text-${background} bg-${color}-700 rounded shadow-lg text-center`}
@@ -140,13 +112,20 @@ export default function ValueOverlay({ highlights, theme }: Props) {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={handleToggleAutoplay}
+            onClick={() => {
+              setAutoplay((prev) => !prev);
+              setInterrupted(false);
+            }}
             className={`bg-${color}-400 hover:bg-${color}-500 text-${background} px-3 py-1 text-xs rounded shadow`}
           >
             {autoplay ? 'Pause' : interrupted ? 'Resume' : 'Resume'}
           </button>
           <button
-            onClick={handleReplay}
+            onClick={() => {
+              setActiveIndex(0);
+              setAutoplay(true);
+              setInterrupted(false);
+            }}
             className={`bg-${color}-600 hover:bg-${color}-700 text-${background} px-4 py-2 rounded shadow`}
           >
             Replay

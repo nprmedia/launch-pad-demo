@@ -7,31 +7,33 @@ import { Playfair_Display, Inter } from 'next/font/google';
 import ValueOverlay from "@/components/ValueOverlay";
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
-const highlights = [
+import { useEffect } from 'react';
+
+const rawHighlights = [
   {
     targetId: "main-cta",
-    message: "Hooks visitors above the fold with a conversion-optimized hero.",
+    message: "Hooks visitors above the fold with a conversion-optimized hero."
   },
   {
     targetId: "lead-magnet",
-    message: "Drives email signups with a high-value lead magnet and instant visual appeal.",
+    message: "Drives email signups with a high-value lead magnet and instant visual appeal."
   },
   {
     targetId: "features",
-    message: "Explains product benefits clearly with value-first feature layout.",
+    message: "Explains product benefits clearly with value-first feature layout."
   },
   {
     targetId: "social-proof",
-    message: "Builds trust using credibility indicators styled like 7-figure founders.",
+    message: "Builds trust using credibility indicators styled like 7-figure founders."
   },
   {
     targetId: "faq",
-    message: "Overcomes objections before they’re raised with rapid Q&A format.",
+    message: "Overcomes objections before they’re raised with rapid Q&A format."
   },
   {
     targetId: "cta-footer",
-    message: "Closes the loop with urgency, reinforcing the offer and next action.",
-  },
+    message: "Closes the loop with urgency, reinforcing the offer and next action."
+  }
 ];
 
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '700'] });
@@ -43,6 +45,51 @@ const fadeUp = {
 };
 
 export default function LaunchPadPage() {
+  const [highlights, setHighlights] = useState<{
+    targetId: string;
+    message: string;
+    coordinates: {
+      top: number;
+      left: number;
+      width: number;
+      height: number;
+    };
+  }[]>([]);
+
+  useEffect(() => {
+    const compute = () => {
+      const dynamicHighlights = rawHighlights.map((h) => {
+        const el = document.getElementById(h.targetId);
+        if (!el) {
+          console.warn(`Missing element for highlight: ${h.targetId}`);
+        }
+        const rect = el?.getBoundingClientRect();
+        return {
+          ...h,
+          coordinates: rect
+            ? {
+                top: rect.top + window.scrollY,
+                left: rect.left + window.scrollX,
+                width: rect.width || 640,
+                height: rect.height || 320,
+              }
+            : {
+                top: 0,
+                left: 0,
+                width: 640,
+                height: 320,
+              },
+        };
+      });
+      setHighlights(dynamicHighlights);
+    };
+
+    setTimeout(() => requestAnimationFrame(compute), 100);
+
+    const handleResize = () => requestAnimationFrame(compute);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null);
   const toggleFAQ = (index: number) => setActiveFAQ(activeFAQ === index ? null : index);
 
