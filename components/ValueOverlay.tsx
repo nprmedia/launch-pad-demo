@@ -16,62 +16,47 @@ interface Props {
   };
 }
 
-export const launchPadHighlights: Highlight[] = [
-  {
-    targetId: 'main-cta',
-    message: 'Your first impression section — hooks and converts above the fold.',
-  },
-  {
-    targetId: 'lead-magnet',
-    message: 'Capture emails instantly with a lead magnet CTA and visual mockup.',
-  },
-  {
-    targetId: 'features',
-    message: 'Feature list styled to communicate value clearly and fast.',
-  },
-  {
-    targetId: 'social-proof',
-    message: 'Trust-building layout inspired by 7-figure coaching sites.',
-  },
-  {
-    targetId: 'faq',
-    message: 'Handles objections before they happen — fast and scrollable.',
-  },
-  {
-    targetId: 'cta-footer',
-    message: 'Closes the loop with urgency and offer reinforcement.',
-  },
-];
-
 export default function ValueOverlay({ highlights, theme }: Props) {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [positions, setPositions] = useState<any[]>([]);
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [positions, setPositions] = useState<{
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  }[]>([]);
   const [autoplay, setAutoplay] = useState(true);
+  const [interrupted, setInterrupted] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState<number>(0);
+
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
   const color = theme?.color || 'indigo';
   const background = theme?.background || 'white';
 
+  // Calculate positions
   useEffect(() => {
     const computePositions = () => {
-      const newPositions = highlights.map((highlight) => {
+      const updated = highlights.map((highlight) => {
         const el = document.getElementById(highlight.targetId);
         if (!el) return { top: 0, left: 0, width: 300, height: 200 };
         const rect = el.getBoundingClientRect();
         return {
           top: rect.top + window.scrollY,
           left: rect.left + window.scrollX,
-          width: rect.width,
-          height: rect.height,
+          width: rect.width || 300,
+          height: rect.height || 200,
         };
       });
-      setPositions(newPositions);
+      setPositions(updated);
     };
 
     setTimeout(computePositions, 300);
     window.addEventListener('resize', computePositions);
+    window.addEventListener('scroll', handleScrollInterrupt);
     return () => {
       window.removeEventListener('resize', computePositions);
+      window.removeEventListener('scroll', handleScrollInterrupt);
     };
   }, [highlights]);
 
@@ -83,19 +68,42 @@ export default function ValueOverlay({ highlights, theme }: Props) {
       behavior: 'smooth',
     });
 
-    if (autoplay) {
+    if (autoplay && !interrupted) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
         if (activeIndex < highlights.length - 1) setActiveIndex((prev) => prev + 1);
       }, 4000);
     }
-  }, [activeIndex, positions, autoplay]);
+  }, [activeIndex, positions, autoplay, interrupted, highlights.length]);
+
+  const handleScrollInterrupt = () => {
+    const currentY = window.scrollY;
+    if (Math.abs(currentY - lastScrollY) > 10 && autoplay) {
+      setAutoplay(false);
+      setInterrupted(true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    }
+    setLastScrollY(currentY);
+  };
+
+  const handleReplay = () => {
+    setActiveIndex(0);
+    setAutoplay(true);
+    setInterrupted(false);
+  };
+
+  const handleToggleAutoplay = () => {
+    setAutoplay((prev) => !prev);
+    setInterrupted(false);
+  };
 
   if (!positions[activeIndex]) return null;
   const current = positions[activeIndex];
 
   return (
     <div ref={overlayRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity" />
+
       <AnimatePresence>
         <motion.div
           key={`highlight-${activeIndex}`}
@@ -132,21 +140,23 @@ export default function ValueOverlay({ highlights, theme }: Props) {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => setAutoplay(!autoplay)}
+            onClick={handleToggleAutoplay}
             className={`bg-${color}-400 hover:bg-${color}-500 text-${background} px-3 py-1 text-xs rounded shadow`}
           >
-            {autoplay ? 'Pause' : 'Resume'}
+            {autoplay ? 'Pause' : interrupted ? 'Resume' : 'Resume'}
           </button>
           <button
-            onClick={() => {
-              setActiveIndex(0);
-              setAutoplay(true);
-            }}
+            onClick={handleReplay}
             className={`bg-${color}-600 hover:bg-${color}-700 text-${background} px-4 py-2 rounded shadow`}
           >
             Replay
           </button>
         </div>
+        {interrupted && (
+          <div className="mt-2 text-xs text-white/70 text-right">
+            Walkthrough paused — scroll detected.
+          </div>
+        )}
       </div>
     </div>
   );

@@ -4,8 +4,35 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Playfair_Display, Inter } from 'next/font/google';
-import ValueOverlay, { launchPadHighlights } from '@/components/ValueOverlay';
+import ValueOverlay from "@/components/ValueOverlay";
 import { SpeedInsights } from '@vercel/speed-insights/next';
+
+const highlights = [
+  {
+    targetId: "main-cta",
+    message: "Hooks visitors above the fold with a conversion-optimized hero.",
+  },
+  {
+    targetId: "lead-magnet",
+    message: "Drives email signups with a high-value lead magnet and instant visual appeal.",
+  },
+  {
+    targetId: "features",
+    message: "Explains product benefits clearly with value-first feature layout.",
+  },
+  {
+    targetId: "social-proof",
+    message: "Builds trust using credibility indicators styled like 7-figure founders.",
+  },
+  {
+    targetId: "faq",
+    message: "Overcomes objections before they’re raised with rapid Q&A format.",
+  },
+  {
+    targetId: "cta-footer",
+    message: "Closes the loop with urgency, reinforcing the offer and next action.",
+  },
+];
 
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '700'] });
 const inter = Inter({ subsets: ['latin'], weight: ['400', '600', '700'] });
@@ -33,7 +60,7 @@ export default function LaunchPadPage() {
 
   return (
     <main className={`${inter.className} bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white overflow-x-hidden w-full`}>
-      <ValueOverlay highlights={launchPadHighlights} />
+      <ValueOverlay highlights={highlights} />
 
       <motion.section
         id="main-cta"
