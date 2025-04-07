@@ -95,7 +95,7 @@ export default function Page() {
     resizeObserver.observe(document.body);
 
     return () => resizeObserver.disconnect();
-  }, []);
+  }, [debug]);
 
   return (
     <>
@@ -175,7 +175,7 @@ export default function Page() {
     </div>
     <div>
       <h4 className="text-lg font-semibold">Is this worth $1,000?</h4>
-      <p className="text-gray-600">We think it’s underpriced. Founders routinely spend 5x more for worse UX.</p>
+      <p className="text-gray-600">We think it&apos;s underpriced. Founders routinely spend 5x more for worse UX.</p>
     </div>
   </div>
 </section>

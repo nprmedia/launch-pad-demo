@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Highlight {
@@ -34,35 +34,32 @@ export default function ValueOverlay({ highlights, theme }: Props) {
   const color = theme?.color || 'indigo';
   const background = theme?.background || 'white';
 
-  const handleScrollInterrupt = () => {
+  const handleScrollInterrupt = useCallback(() => {
     const currentY = window.scrollY;
     const direction = Math.abs(currentY - lastScrollY);
     const tooFast = direction > 20;
-  
+
     if (tooFast && autoplay) {
       setAutoplay(false);
       setInterrupted(true);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     }
-  
+
     setLastScrollY(currentY);
-  };  
+  }, [autoplay, lastScrollY]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScrollInterrupt);
     return () => window.removeEventListener('scroll', handleScrollInterrupt);
-  }, [autoplay]);
+  }, [handleScrollInterrupt]);
 
   useEffect(() => {
-    if (!highlights.length || !highlights[activeIndex]) return;
-    const current = highlights[activeIndex].coordinates;
-  
-    // Log scroll position calculation
-    console.log("Scrolling to position:", current.top - window.innerHeight / 2 + current.height / 2);
-  
+    if (!highlights[activeIndex]) return;
+    const { top, height } = highlights[activeIndex].coordinates;
+
     setTimeout(() => {
       window.scrollTo({
-        top: current.top - window.innerHeight / 2 + current.height / 2,
+        top: top - window.innerHeight / 2 + height / 2,
         behavior: 'smooth',
       });
     }, 100);
@@ -78,41 +75,33 @@ export default function ValueOverlay({ highlights, theme }: Props) {
   if (!highlights.length || !highlights[activeIndex]) return null;
   const current = highlights[activeIndex].coordinates;
 
-  console.log("Overlay Position:", {
-    top: window.innerHeight / 2 - current.height / 2,
-    left: current.left,
-    width: current.width,
-    height: current.height,
-  });
-
   return (
     <div ref={overlayRef} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]">
       <div className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity" />
 
-  <AnimatePresence>
-    <motion.div
-      key={`highlight-${activeIndex}`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      style={{
-        position: 'absolute',
-        top: window.innerHeight / 2 - current.height / 2,
-        left: current.left,
-        width: current.width,
-        height: current.height,
-      }}
-      className={`border-4 border-${color}-500 rounded-xl bg-transparent pointer-events-none`}
-    >
-      <div
-        className={`absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] px-4 py-2 text-sm font-medium text-${background} bg-${color}-700 rounded shadow-lg text-center`}
-      >
-        {highlights[activeIndex].message}
-      </div>
-    </motion.div>
-  </AnimatePresence>
-
+      <AnimatePresence>
+        <motion.div
+          key={`highlight-${activeIndex}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            position: 'absolute',
+            top: window.innerHeight / 2 - current.height / 2,
+            left: current.left,
+            width: current.width,
+            height: current.height,
+          }}
+          className={`border-4 border-${color}-500 rounded-xl bg-transparent pointer-events-none`}
+        >
+          <div
+            className={`absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] px-4 py-2 text-sm font-medium text-${background} bg-${color}-700 rounded shadow-lg text-center`}
+          >
+            {highlights[activeIndex].message}
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
       <div className="absolute bottom-6 right-6 pointer-events-auto flex flex-col items-end gap-2">
         <div className="flex gap-1">
