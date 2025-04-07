@@ -84,8 +84,12 @@ export default function LaunchPadPage() {
       setHighlights(dynamicHighlights);
     };
 
-    setTimeout(() => requestAnimationFrame(compute), 100);
-
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(compute);
+      });
+    }, 300);
+    
     const handleResize = () => requestAnimationFrame(compute);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);

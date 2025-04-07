@@ -36,13 +36,17 @@ export default function ValueOverlay({ highlights, theme }: Props) {
 
   const handleScrollInterrupt = () => {
     const currentY = window.scrollY;
-    if (Math.abs(currentY - lastScrollY) > 10 && autoplay) {
+    const direction = Math.abs(currentY - lastScrollY);
+    const tooFast = direction > 20;
+  
+    if (tooFast && autoplay) {
       setAutoplay(false);
       setInterrupted(true);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     }
+  
     setLastScrollY(currentY);
-  };
+  };  
 
   useEffect(() => {
     window.addEventListener('scroll', handleScrollInterrupt);
