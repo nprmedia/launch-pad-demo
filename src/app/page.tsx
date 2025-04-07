@@ -159,7 +159,7 @@ export default function LaunchPadPage() {
         whileInView="show"
         viewport={{ once: true }}
       >
-        <Image src="/images/lead-magnet.png" alt="Lead magnet mockup" width={480} height={320} className="rounded-xl shadow-xl w-full md:w-auto" />
+        <Image src="/images/lead-magnet.png" alt="Lead magnet mockup" width={480} height={320} priority className="rounded-xl shadow-xl w-full md:w-auto" />
         <div className="w-full max-w-xl text-center md:text-left">
           <h2 className="text-2xl sm:text-3xl font-semibold mb-4">Capture Emails with a Magnetic Giveaway</h2>
           <p className="text-white/80 mb-6 text-sm sm:text-base">Offer a checklist, template, or guide — we build the exact section that gets subscribers.</p>
