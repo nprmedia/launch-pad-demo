@@ -1,11 +1,12 @@
 // File: components/overlay/OverlayWalkthrough.tsx
-// Purpose: Walkthrough overlay that now auto-starts on page load (no query param required)
+// Purpose: Walkthrough overlay now fixed to bottom, no blur, and Finish CTA optimized for conversion
 
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 interface WalkthroughStep {
   title: string;
@@ -38,14 +39,15 @@ const steps: WalkthroughStep[] = [
 
 export const OverlayWalkthrough = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
   const [active, setActive] = useState(false);
 
   const currentStep = steps[stepIndex];
 
   useEffect(() => {
-    const shouldStart = true; // always trigger on load
-    localStorage.removeItem('walkthroughDismissed'); // optional: always show for testing/demo
+    const shouldStart = true;
+    localStorage.removeItem('walkthroughDismissed');
     const dismissed = localStorage.getItem('walkthroughDismissed');
     if (shouldStart && !dismissed) setActive(true);
   }, [searchParams]);
@@ -78,7 +80,7 @@ export const OverlayWalkthrough = () => {
     localStorage.setItem('walkthroughDismissed', 'true');
     setActive(false);
     setStepIndex(0);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    router.push('/checkout?plan=launch-pad'); // replace with CTA path for conversion
   };
 
   const handleDismiss = () => {
@@ -90,20 +92,18 @@ export const OverlayWalkthrough = () => {
     <AnimatePresence>
       {active && (
         <motion.div
-          key="overlay-backdrop"
-          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex items-center justify-center"
+          key="overlay-wrapper"
+          className="fixed inset-0 z-50 pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={handleDismiss}
         >
           <motion.div
             key="overlay-card"
-            className="relative bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-2xl z-10 max-w-sm min-w-[320px] mx-4 text-center"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl z-10 max-w-sm min-w-[320px] mx-4 text-center pointer-events-auto"
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 30, opacity: 0 }}
           >
             <h2 className="text-lg font-semibold text-brand">{currentStep.title}</h2>
             <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">{currentStep.description}</p>
@@ -128,7 +128,7 @@ export const OverlayWalkthrough = () => {
                   onClick={handleFinish}
                   className="px-4 py-2 rounded bg-green-600 text-white text-sm"
                 >
-                  Finish
+                  Place Your Order
                 </button>
               )}
             </div>
