@@ -1,17 +1,13 @@
 // File: src/app/layout.tsx
-// Purpose: Root layout with suspense-safe overlay integration and production-safe setup
+// Purpose: Root layout with suspense-safe overlay integration using a client wrapper
 
 import '../styles/globals.css';
-import { ReactNode, Suspense } from 'react';
+import { ReactNode } from 'react';
 import { Inter } from 'next/font/google';
 import { Metadata } from 'next';
-import dynamic from 'next/dynamic';
+import { OverlayWalkthroughWrapper } from '@/components/overlay/OverlayWalkthroughWrapper';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' });
-const OverlayWalkthrough = dynamic(() =>
-  import('@/components/overlay/OverlayWalkthrough').then((mod) => mod.OverlayWalkthrough),
-  { ssr: false }
-);
 
 export const metadata: Metadata = {
   title: 'Launch Pad Demo – Coaches & Consultants',
@@ -33,9 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={inter.variable}>
       <body className="bg-white text-black dark:bg-black dark:text-white antialiased">
         {children}
-        <Suspense fallback={null}>
-          <OverlayWalkthrough />
-        </Suspense>
+        <OverlayWalkthroughWrapper />
       </body>
     </html>
   );
