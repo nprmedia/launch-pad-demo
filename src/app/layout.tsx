@@ -5,7 +5,6 @@ import '../styles/globals.css';
 import { ReactNode } from 'react';
 import { Inter } from 'next/font/google';
 import { Metadata } from 'next';
-import { OverlayWalkthroughWrapper } from '@/components/overlay/OverlayWalkthroughWrapper';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' });
 
@@ -29,7 +28,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={inter.variable}>
       <body className="bg-white text-black dark:bg-black dark:text-white antialiased">
         {children}
-        <OverlayWalkthroughWrapper />
       </body>
     </html>
   );
