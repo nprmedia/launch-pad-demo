@@ -1,5 +1,7 @@
-// File: app/page.tsx
-// Purpose: Landing page layout combining all sections in order
+// File: src/app/page.tsx
+// Purpose: Root landing page entry point with client-only rendering and embedded overlay walkthrough
+
+'use client';
 
 import { HeroSection } from '@/components/sections/HeroSection';
 import { LeadMagnetSection } from '@/components/sections/LeadMagnetSection';
@@ -8,7 +10,7 @@ import { SocialProofSection } from '@/components/sections/SocialProofSection';
 import { FAQSection } from '@/components/sections/FAQSection';
 import { CTASection } from '@/components/sections/CTASection';
 import { FooterSection } from '@/components/sections/FooterSection';
-import { OverlayWalkthrough } from '@/components/overlay/OverlayWalkthrough';
+import { OverlayWalkthroughWrapper } from '@/components/overlay/OverlayWalkthroughWrapper';
 
 export default function HomePage() {
   return (
@@ -20,7 +22,7 @@ export default function HomePage() {
       <FAQSection />
       <CTASection />
       <FooterSection />
-      <OverlayWalkthrough />    
+      <OverlayWalkthroughWrapper />
     </main>
   );
 }
