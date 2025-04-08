@@ -1,9 +1,9 @@
 // File: components/overlay/OverlayWalkthrough.tsx
-// Purpose: Fully upgraded walkthrough with section highlight, tooltip pointer, feedback, auto-collapse, mini-map
+// Purpose: Tooltip is now dynamically positioned near each target section using absolute coordinates
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -49,6 +49,8 @@ export const OverlayWalkthrough = () => {
   const [active, setActive] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const currentStep = steps[stepIndex];
 
@@ -64,6 +66,13 @@ export const OverlayWalkthrough = () => {
     const target = document.getElementById(currentStep.anchorId);
     if (target) {
       target.classList.add('ring-2', 'ring-brand', 'rounded-lg');
+      const rect = target.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset;
+      const scrollX = window.scrollX || window.pageXOffset;
+      const top = rect.top + scrollY + rect.height + 16;
+      const left = rect.left + scrollX + rect.width / 2;
+      setPosition({ top, left });
+
       setTimeout(() => {
         requestAnimationFrame(() => {
           target.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -113,14 +122,14 @@ export const OverlayWalkthrough = () => {
         >
           {!minimized && (
             <motion.div
+              ref={cardRef}
               key="overlay-card"
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-zinc-900/90 border border-gray-200 dark:border-zinc-700 px-6 py-5 rounded-2xl shadow-2xl z-10 max-w-sm min-w-[320px] mx-4 text-left pointer-events-auto relative"
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 30, opacity: 0 }}
+              className="absolute z-50 bg-white/90 dark:bg-zinc-900/90 border border-gray-200 dark:border-zinc-700 px-6 py-5 rounded-2xl shadow-2xl max-w-sm min-w-[320px] text-left pointer-events-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              style={{ top: position.top, left: position.left, transform: 'translateX(-50%)' }}
             >
-              <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-zinc-900 rotate-45 border-l border-t border-gray-200 dark:border-zinc-700"></div>
-
               <div className="flex justify-between items-center mb-1">
                 <h2 className="text-base font-semibold text-brand">
                   {currentStep.icon} {currentStep.title}
@@ -210,7 +219,7 @@ export const OverlayWalkthrough = () => {
           {minimized && (
             <button
               onClick={toggleMinimized}
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-brand text-white px-4 py-2 rounded-full text-sm shadow-md z-10 pointer-events-auto"
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-brand text-white px-4 py-2 rounded-full text-sm shadow-md z-10 pointer-events-auto"
             >
               Resume Walkthrough
             </button>
