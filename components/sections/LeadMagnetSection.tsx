@@ -19,13 +19,14 @@ export const LeadMagnetSection = () => {
   const onSubmit = async (data: FormData) => {
     // Simulate Mailchimp submission with delay
     await new Promise((res) => setTimeout(res, 800));
+    console.log('Submitted data:', data);
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 3000);
     reset();
   };
 
   return (
-    <section id="lead-magnet-section" className="py-20 px-6 bg-gray-50 dark:bg-gray-900 text-center">
+    <section className="py-20 px-6 bg-gray-50 dark:bg-gray-900 text-center" id="lead-magnet-section">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
