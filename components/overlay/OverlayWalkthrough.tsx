@@ -4,7 +4,6 @@
 'use client';
 
 import React, {
-  useLayoutEffect,
   useRef,
   useState,
   useEffect,
@@ -40,7 +39,6 @@ export const OverlayWalkthrough = () => {
 
     targetRef.current = target;
 
-    // Focus tooltip after render
     requestAnimationFrame(() => tooltip?.focus());
 
     const updatePosition = () => {
@@ -63,7 +61,6 @@ export const OverlayWalkthrough = () => {
       });
     };
 
-    // Disconnect previous observer if exists
     if (observerRef.current) observerRef.current.disconnect();
 
     const newObserver = new ResizeObserver(() => {
@@ -79,7 +76,7 @@ export const OverlayWalkthrough = () => {
     return () => {
       newObserver.disconnect();
     };
-  }, [stepIndex]);
+  }, [stepIndex, currentStep.id]);
 
   // Force animation class to reapply per step
   useEffect(() => {
