@@ -47,14 +47,16 @@ export const OverlayWalkthrough = () => {
   const [active, setActive] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [position, setPosition] = useState({ top: 200, left: window.innerWidth / 2 });
-  const cardRef = useRef<HTMLDivElement>(null);
+    const cardRef = useRef<HTMLDivElement>(null);
 
   const currentStep = steps[stepIndex];
+
+  const [position, setPosition] = useState({ top: 200, left: 0 });
 
   useEffect(() => {
     setActive(true);
     setMinimized(false);
+    setPosition(prev => ({ ...prev, left: window.innerWidth / 2 }));
   }, []);
 
   useEffect(() => {
