@@ -33,10 +33,14 @@ export const OverlayWalkthrough = () => {
         return Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, centeredLeft));
       };
 
-      setPosition({
-        top: rect.bottom + offsetY + window.scrollY,
-        left: calcLeft() + window.scrollX,
-      });
+      const top = Math.min(
+        rect.bottom + offsetY + window.scrollY,
+        window.scrollY + window.innerHeight - (tooltip?.offsetHeight || 100) - 16
+      );
+
+      const left = calcLeft() + window.scrollX;
+
+      setPosition({ top, left });
 
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
