@@ -1,9 +1,9 @@
 // File: components/overlay/OverlayWalkthrough.tsx
-// Step 1: UI polish pass — spacing, shadows, mobile sizing, animation
+// Step 2: Add anchored dynamic positioning to tooltip
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const steps = [
   { id: 'hero-section', label: 'Welcome to the Hero Section' },
@@ -16,19 +16,37 @@ const steps = [
 
 export const OverlayWalkthrough = () => {
   const [stepIndex, setStepIndex] = useState(0);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
   const currentStep = steps[stepIndex];
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const target = document.getElementById(currentStep.id);
     if (target) {
+      const rect = target.getBoundingClientRect();
+      const tooltip = tooltipRef.current;
+      const offsetY = 16;
+
+      const calcLeft = () => {
+        const tooltipWidth = tooltip?.offsetWidth || 300;
+        const centeredLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
+        return Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, centeredLeft));
+      };
+
+      setPosition({
+        top: rect.bottom + offsetY + window.scrollY,
+        left: calcLeft() + window.scrollX,
+      });
+
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [stepIndex]);
 
   return (
     <div
-      className="fixed z-50 bottom-8 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-4 rounded-2xl shadow-2xl text-sm max-w-md w-[90%] animate-fade-in"
-      style={{ animationDuration: '300ms' }}
+      ref={tooltipRef}
+      className="absolute z-50 bg-black text-white px-6 py-4 rounded-2xl shadow-2xl text-sm max-w-md w-[90%] animate-fade-in transition-all duration-300"
+      style={{ top: position.top, left: position.left, animationDuration: '300ms' }}
     >
       <div className="mb-3 font-medium leading-tight text-center">
         {currentStep.label}
