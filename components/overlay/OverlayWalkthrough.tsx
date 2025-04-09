@@ -22,10 +22,13 @@ export const OverlayWalkthrough = () => {
 
   useEffect(() => {
     const target = document.getElementById(currentStep.id);
-    if (target) {
+    if (!target) return;
+
+    const tooltip = tooltipRef.current;
+    const offsetY = 16;
+
+    requestAnimationFrame(() => {
       const rect = target.getBoundingClientRect();
-      const tooltip = tooltipRef.current;
-      const offsetY = 16;
 
       const calcLeft = () => {
         const tooltipWidth = tooltip?.offsetWidth || 300;
@@ -42,8 +45,10 @@ export const OverlayWalkthrough = () => {
 
       setPosition({ top, left });
 
-      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
   }, [stepIndex]);
 
   return (
