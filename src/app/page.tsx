@@ -9,7 +9,7 @@ import { FeatureSection } from '@/components/sections/FeatureSection';
 import { SocialProofSection } from '@/components/sections/SocialProofSection';
 import { CTASection } from '@/components/sections/CTASection';
 import { FooterSection } from '@/components/sections/FooterSection';
-import { OverlayWalkthrough } from '@/components/overlay/OverlayWalkthrough';
+import { OverlayWalkthroughWrapper } from '@/components/overlay/OverlayWalkthroughWrapper';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
@@ -45,7 +45,7 @@ export default function Page() {
         <FooterSection />
       </section>
 
-      {hydrated && <OverlayWalkthrough />}
+      {hydrated && <OverlayWalkthroughWrapper />}
     </main>
   );
 }
