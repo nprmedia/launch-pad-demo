@@ -1,5 +1,5 @@
 // File: components/overlay/OverlayWalkthrough.tsx
-// Tooltip: Dynamically positioned + fallback + debug logs + DOM settle timeout
+// Improvements: Visibility flag + safe render guard + double animation frame scroll
 
 'use client';
 
@@ -47,11 +47,11 @@ export const OverlayWalkthrough = () => {
   const [active, setActive] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-    const cardRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  const [position, setPosition] = useState({ top: 200, left: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const currentStep = steps[stepIndex];
-
-  const [position, setPosition] = useState({ top: 200, left: 0 });
 
   useEffect(() => {
     setActive(true);
@@ -78,9 +78,12 @@ export const OverlayWalkthrough = () => {
 
       console.log(`[Overlay] Scroll to anchor '${currentStep.anchorId}':`, rect);
       setPosition({ top, left });
+      setVisible(true);
 
       requestAnimationFrame(() => {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        requestAnimationFrame(() => {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
       });
     }, 300);
 
@@ -123,7 +126,7 @@ export const OverlayWalkthrough = () => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {!minimized && (
+          {!minimized && visible && (
             <motion.div
               ref={cardRef}
               key="overlay-card"
