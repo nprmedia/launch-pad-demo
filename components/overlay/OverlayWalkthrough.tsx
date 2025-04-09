@@ -4,7 +4,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
@@ -43,8 +42,7 @@ const steps: WalkthroughStep[] = [
 ];
 
 export const OverlayWalkthrough = () => {
-  const searchParams = useSearchParams();
-  const router = useRouter();
+    const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
   const [active, setActive] = useState(false);
   const [minimized, setMinimized] = useState(false);
