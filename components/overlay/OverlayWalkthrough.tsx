@@ -55,11 +55,8 @@ export const OverlayWalkthrough = () => {
   const currentStep = steps[stepIndex];
 
   useEffect(() => {
-    const shouldStart = true;
-    localStorage.removeItem('walkthroughDismissed');
-    const dismissed = localStorage.getItem('walkthroughDismissed');
-    if (shouldStart && !dismissed) setActive(true);
-  }, [searchParams]);
+  setActive(true);
+}, []);
 
   useEffect(() => {
     if (!active || minimized) return;
