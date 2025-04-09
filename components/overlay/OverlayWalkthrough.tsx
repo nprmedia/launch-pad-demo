@@ -27,26 +27,29 @@ export const OverlayWalkthrough = () => {
     const tooltip = tooltipRef.current;
     const offsetY = 16;
 
-    requestAnimationFrame(() => {
+    const updateTooltipPosition = () => {
+      if (!tooltip) return;
       const rect = target.getBoundingClientRect();
+      const tooltipWidth = tooltip.offsetWidth || 300;
+      const tooltipHeight = tooltip.offsetHeight || 100;
 
-      const calcLeft = () => {
-        const tooltipWidth = tooltip?.offsetWidth || 300;
-        const centeredLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
-        return Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, centeredLeft));
-      };
+      const centeredLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
+      const clampedLeft = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, centeredLeft));
 
-      const top = Math.min(
-        rect.bottom + offsetY + window.scrollY,
-        window.scrollY + window.innerHeight - (tooltip?.offsetHeight || 100) - 16
-      );
+      const rawTop = rect.bottom + offsetY + window.scrollY;
+      const maxTop = window.scrollY + window.innerHeight - tooltipHeight - 16;
+      const clampedTop = Math.min(rawTop, maxTop);
 
-      const left = calcLeft() + window.scrollX;
+      setPosition({ top: clampedTop, left: clampedLeft + window.scrollX });
+    };
 
-      setPosition({ top, left });
-
+    // Use two animation frames to ensure layout is stable
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        updateTooltipPosition();
+        // Scroll manually instead of scrollIntoView to avoid DOM layout shift surprises
+        const sectionTop = target.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: sectionTop - window.innerHeight / 4, behavior: 'smooth' });
       });
     });
   }, [stepIndex]);
