@@ -3,7 +3,7 @@
 
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const steps = [
   { id: 'hero-section', label: 'Welcome to the Hero Section' },
@@ -20,18 +20,20 @@ export const OverlayWalkthrough = () => {
   const currentStep = steps[stepIndex];
   const tooltipRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  
+  useLayoutEffect(() => {
     const target = document.getElementById(currentStep.id);
-    if (!target) return;
-
     const tooltip = tooltipRef.current;
+    if (!target || !tooltip) return;
+
     const offsetY = 16;
 
     const updateTooltipPosition = () => {
-      if (!tooltip) return;
       const rect = target.getBoundingClientRect();
       const tooltipWidth = tooltip.offsetWidth || 300;
       const tooltipHeight = tooltip.offsetHeight || 100;
+
+      if (tooltipHeight < 10) return; // Prevent update if not rendered
 
       const centeredLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
       const clampedLeft = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, centeredLeft));
@@ -43,15 +45,13 @@ export const OverlayWalkthrough = () => {
       setPosition({ top: clampedTop, left: clampedLeft + window.scrollX });
     };
 
-    // Use two animation frames to ensure layout is stable
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        updateTooltipPosition();
-        // Scroll manually instead of scrollIntoView to avoid DOM layout shift surprises
-        const sectionTop = target.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: sectionTop - window.innerHeight / 4, behavior: 'smooth' });
-      });
+    const frame = requestAnimationFrame(() => {
+      updateTooltipPosition();
+      const sectionTop = target.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: sectionTop - window.innerHeight / 4, behavior: 'smooth' });
     });
+
+    return () => cancelAnimationFrame(frame);
   }, [stepIndex]);
 
   return (
