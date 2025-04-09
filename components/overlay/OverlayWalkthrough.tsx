@@ -21,7 +21,6 @@ const steps = [
 export const OverlayWalkthrough = () => {
   const [stepIndex, setStepIndex] = useState(FIRST_STEP_INDEX);
   const [position, setPosition] = useState({ top: 0, left: 0 });
-  const [tooltipKey, setTooltipKey] = useState(0);
   const currentStep = steps[stepIndex];
 
   const tooltipRef = useRef<HTMLDivElement | null>(null);
@@ -73,7 +72,7 @@ export const OverlayWalkthrough = () => {
 
     setPosition({ top: clampedTop, left: clampedLeft + window.scrollX });
 
-    requestAnimationFrame(() => tooltip.focus());
+    requestAnimationFrame(() => tooltip?.focus());
   }, [currentStep.id, waitForLayoutStability]);
 
   const runStepLogic = useCallback(async () => {
@@ -84,7 +83,6 @@ export const OverlayWalkthrough = () => {
   }, [currentStep.id, waitForLayoutStability, waitForScrollEnd, positionTooltip]);
 
   useEffect(() => {
-    setTooltipKey(stepIndex);
     runStepLogic();
   }, [stepIndex, runStepLogic]);
 
@@ -96,7 +94,6 @@ export const OverlayWalkthrough = () => {
 
   return (
     <div
-      key={tooltipKey}
       ref={tooltipRef}
       role="dialog"
       aria-live="polite"
