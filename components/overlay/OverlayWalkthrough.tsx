@@ -1,5 +1,5 @@
 // File: components/overlay/OverlayWalkthrough.tsx
-// Purpose: Tooltip is now dynamically positioned near each target section using absolute coordinates
+// Tooltip: Dynamically positioned + fallback + debug logs + DOM settle timeout
 
 'use client';
 
@@ -42,40 +42,48 @@ const steps: WalkthroughStep[] = [
 ];
 
 export const OverlayWalkthrough = () => {
-    const router = useRouter();
+  const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
   const [active, setActive] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [position, setPosition] = useState({ top: 200, left: window.innerWidth / 2 });
   const cardRef = useRef<HTMLDivElement>(null);
 
   const currentStep = steps[stepIndex];
 
   useEffect(() => {
-  setActive(true);
-}, []);
+    setActive(true);
+    setMinimized(false);
+  }, []);
 
   useEffect(() => {
     if (!active || minimized) return;
     const target = document.getElementById(currentStep.anchorId);
-    if (target) {
-      target.classList.add('ring-2', 'ring-brand', 'rounded-lg');
+    if (!target) {
+      console.warn(`[Overlay] Target not found for: ${currentStep.anchorId}`);
+      return;
+    }
+
+    target.classList.add('ring-2', 'ring-brand', 'rounded-lg');
+
+    setTimeout(() => {
       const rect = target.getBoundingClientRect();
       const scrollY = window.scrollY || window.pageYOffset;
       const scrollX = window.scrollX || window.pageXOffset;
       const top = rect.top + scrollY + rect.height + 16;
       const left = rect.left + scrollX + rect.width / 2;
+
+      console.log(`[Overlay] Scroll to anchor '${currentStep.anchorId}':`, rect);
       setPosition({ top, left });
 
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
-      }, 150);
-    }
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }, 300);
+
     return () => {
-      if (target) target.classList.remove('ring-2', 'ring-brand', 'rounded-lg');
+      target.classList.remove('ring-2', 'ring-brand', 'rounded-lg');
     };
   }, [stepIndex, active, currentStep.anchorId, minimized]);
 
@@ -87,9 +95,7 @@ export const OverlayWalkthrough = () => {
     if (stepIndex > 0) setStepIndex(stepIndex - 1);
   };
 
-  const handleFinish = () => {
-    setShowFeedback(true);
-  };
+  const handleFinish = () => setShowFeedback(true);
 
   const handleFinalSubmit = () => {
     localStorage.setItem('walkthroughDismissed', 'true');
