@@ -1,5 +1,5 @@
 // File: src/app/page.tsx
-// Purpose: Ensures Walkthrough overlay renders properly at page-level, below section content
+// Fully patched: hydration-safe walkthrough + strict section rendering + clarity
 
 'use client';
 
@@ -9,12 +9,18 @@ import { FeatureSection } from '@/components/sections/FeatureSection';
 import { SocialProofSection } from '@/components/sections/SocialProofSection';
 import { CTASection } from '@/components/sections/CTASection';
 import { FooterSection } from '@/components/sections/FooterSection';
-
 import { OverlayWalkthrough } from '@/components/overlay/OverlayWalkthrough';
+import { useEffect, useState } from 'react';
 
 export default function Page() {
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   return (
-    <main className="relative overflow-x-hidden">
+    <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <section id="hero-section">
         <HeroSection />
       </section>
@@ -39,8 +45,7 @@ export default function Page() {
         <FooterSection />
       </section>
 
-      {/* 🔁 Walkthrough overlay is rendered here to ensure client-side behavior */}
-      <OverlayWalkthrough />
+      {hydrated && <OverlayWalkthrough />}
     </main>
   );
 }

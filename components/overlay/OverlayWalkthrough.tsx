@@ -54,10 +54,14 @@ export const OverlayWalkthrough = () => {
   const currentStep = steps[stepIndex];
 
   useEffect(() => {
-    setActive(true);
-    setMinimized(false);
+  setActive(true);
+  setMinimized(false);
+
+  // Delay position assignment to allow full hydration
+  setTimeout(() => {
     setPosition(prev => ({ ...prev, left: window.innerWidth / 2 }));
-  }, []);
+  }, 50);
+}, []);
 
   useEffect(() => {
     if (!active || minimized) return;
