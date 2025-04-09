@@ -3,7 +3,7 @@
 
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 const OFFSET_Y = 16;
 const MIN_TOP = 16;
@@ -26,9 +26,8 @@ export const OverlayWalkthrough = () => {
 
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const observerRef = useRef<ResizeObserver | null>(null);
 
-  const waitForLayoutStability = (id: string): Promise<HTMLElement> => {
+  const waitForLayoutStability = useCallback((id: string): Promise<HTMLElement> => {
     return new Promise((resolve) => {
       const tryFind = () => {
         const el = document.getElementById(id);
@@ -47,16 +46,16 @@ export const OverlayWalkthrough = () => {
         if (tryFind()) clearInterval(interval);
       }, 50);
     });
-  };
+  }, []);
 
-  const waitForScrollEnd = (): Promise<void> => {
+  const waitForScrollEnd = useCallback((): Promise<void> => {
     return new Promise((resolve) => {
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
       scrollTimeoutRef.current = setTimeout(() => resolve(), 200);
     });
-  };
+  }, []);
 
-  const positionTooltip = async () => {
+  const positionTooltip = useCallback(async () => {
     const tooltip = tooltipRef.current;
     const target = await waitForLayoutStability(currentStep.id);
     if (!tooltip || !target) return;
@@ -75,25 +74,25 @@ export const OverlayWalkthrough = () => {
     setPosition({ top: clampedTop, left: clampedLeft + window.scrollX });
 
     requestAnimationFrame(() => tooltip.focus());
-  };
+  }, [currentStep.id, waitForLayoutStability]);
 
-  const runStepLogic = async () => {
+  const runStepLogic = useCallback(async () => {
     const target = await waitForLayoutStability(currentStep.id);
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     await waitForScrollEnd();
     await positionTooltip();
-  };
+  }, [currentStep.id, waitForLayoutStability, waitForScrollEnd, positionTooltip]);
 
   useEffect(() => {
     setTooltipKey(stepIndex);
     runStepLogic();
-  }, [stepIndex]);
+  }, [stepIndex, runStepLogic]);
 
   useEffect(() => {
     const resizeHandler = () => runStepLogic();
     window.addEventListener('resize', resizeHandler);
     return () => window.removeEventListener('resize', resizeHandler);
-  }, [currentStep.id]);
+  }, [runStepLogic]);
 
   return (
     <div
