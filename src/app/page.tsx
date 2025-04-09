@@ -1,5 +1,5 @@
 // File: src/app/page.tsx
-// Rebuilt clean: hydration-safe, distinct wrapper, overlay isolated
+// Final rendering pass with overlay wrapper
 
 'use client';
 
@@ -10,7 +10,7 @@ import { FeatureSection } from '@/components/sections/FeatureSection';
 import { SocialProofSection } from '@/components/sections/SocialProofSection';
 import { CTASection } from '@/components/sections/CTASection';
 import { FooterSection } from '@/components/sections/FooterSection';
-import { OverlayWalkthroughWrapper, Wrapper } from '@/components/overlay/OverlayWalkthroughWrapper';
+import { OverlayWalkthroughWrapper } from '@/components/overlay/OverlayWalkthroughWrapper';
 
 export default function Page() {
   const [hydrated, setHydrated] = useState(false);
@@ -22,39 +22,27 @@ export default function Page() {
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <section id="hero-section">
-        <Wrapper>
-          <HeroSection />
-        </Wrapper>
+        <HeroSection />
       </section>
 
       <section id="lead-magnet-section">
-        <Wrapper>
-          <LeadMagnetSection />
-        </Wrapper>
+        <LeadMagnetSection />
       </section>
 
       <section id="feature-section">
-        <Wrapper>
-          <FeatureSection />
-        </Wrapper>
+        <FeatureSection />
       </section>
 
       <section id="social-proof-section">
-        <Wrapper>
-          <SocialProofSection />
-        </Wrapper>
+        <SocialProofSection />
       </section>
 
       <section id="cta-section">
-        <Wrapper>
-          <CTASection />
-        </Wrapper>
+        <CTASection />
       </section>
 
       <section id="footer-section">
-        <Wrapper>
-          <FooterSection />
-        </Wrapper>
+        <FooterSection />
       </section>
 
       {hydrated && <OverlayWalkthroughWrapper />}
