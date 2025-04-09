@@ -1,9 +1,18 @@
 // File: components/overlay/OverlayWalkthrough.tsx
-// Step 2: Add anchored dynamic positioning to tooltip
+// Fully perfected + hardened overlay walkthrough system
 
 'use client';
 
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, {
+  useLayoutEffect,
+  useRef,
+  useState,
+  useEffect,
+} from 'react';
+
+const OFFSET_Y = 16;
+const MIN_TOP = 16;
+const FIRST_STEP_INDEX = 0;
 
 const steps = [
   { id: 'hero-section', label: 'Welcome to the Hero Section' },
@@ -15,50 +24,77 @@ const steps = [
 ];
 
 export const OverlayWalkthrough = () => {
-  const [stepIndex, setStepIndex] = useState(0);
+  const [stepIndex, setStepIndex] = useState(FIRST_STEP_INDEX);
   const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [tooltipKey, setTooltipKey] = useState(0);
   const currentStep = steps[stepIndex];
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const targetRef = useRef<HTMLElement | null>(null);
+  const observerRef = useRef<ResizeObserver | null>(null);
 
-  
-  useLayoutEffect(() => {
-    const target = document.getElementById(currentStep.id);
+  // Sync tooltip position on step change and DOM resize
+  useEffect(() => {
     const tooltip = tooltipRef.current;
-    if (!target || !tooltip) return;
+    const target = document.getElementById(currentStep.id);
+    if (!tooltip || !target || !tooltip.isConnected || !target.isConnected) return;
 
-    const offsetY = 16;
+    targetRef.current = target;
 
-    const updateTooltipPosition = () => {
+    // Focus tooltip after render
+    requestAnimationFrame(() => tooltip?.focus());
+
+    const updatePosition = () => {
       const rect = target.getBoundingClientRect();
       const tooltipWidth = tooltip.offsetWidth || 300;
       const tooltipHeight = tooltip.offsetHeight || 100;
 
-      if (tooltipHeight < 10) return; // Prevent update if not rendered
-
       const centeredLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
       const clampedLeft = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, centeredLeft));
 
-      const rawTop = rect.bottom + offsetY + window.scrollY;
+      const rawTop = rect.bottom + OFFSET_Y + window.scrollY;
       const maxTop = window.scrollY + window.innerHeight - tooltipHeight - 16;
-      const clampedTop = Math.min(rawTop, maxTop);
+      const clampedTop = Math.max(MIN_TOP, Math.min(rawTop, maxTop));
 
       setPosition({ top: clampedTop, left: clampedLeft + window.scrollX });
+
+      window.scrollTo({
+        top: rect.top + window.scrollY - window.innerHeight / 4,
+        behavior: 'smooth',
+      });
     };
 
-    const frame = requestAnimationFrame(() => {
-      updateTooltipPosition();
-      const sectionTop = target.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top: sectionTop - window.innerHeight / 4, behavior: 'smooth' });
+    // Disconnect previous observer if exists
+    if (observerRef.current) observerRef.current.disconnect();
+
+    const newObserver = new ResizeObserver(() => {
+      window.requestAnimationFrame(updatePosition);
     });
 
-    return () => cancelAnimationFrame(frame);
-  }, [stepIndex, currentStep.id]);
+    observerRef.current = newObserver;
+    if (tooltip.isConnected) newObserver.observe(tooltip);
+    if (target.isConnected) newObserver.observe(target);
+
+    updatePosition();
+
+    return () => {
+      newObserver.disconnect();
+    };
+  }, [stepIndex]);
+
+  // Force animation class to reapply per step
+  useEffect(() => {
+    setTooltipKey(stepIndex);
+  }, [stepIndex]);
 
   return (
     <div
+      key={tooltipKey}
       ref={tooltipRef}
-      className="absolute z-50 bg-black text-white px-6 py-4 rounded-2xl shadow-2xl text-sm max-w-md w-[90%] animate-fade-in transition-all duration-300"
-      style={{ top: position.top, left: position.left, animationDuration: '300ms' }}
+      role="dialog"
+      aria-live="polite"
+      className="fixed z-[9999] bg-black text-white px-6 py-4 rounded-2xl shadow-2xl text-sm max-w-md w-[90%] animate-fade-in transition-all duration-300 focus:outline-none"
+      style={{ top: position.top, left: position.left }}
+      tabIndex={-1}
     >
       <div className="mb-3 font-medium leading-tight text-center">
         {currentStep.label}
@@ -80,7 +116,7 @@ export const OverlayWalkthrough = () => {
           </button>
         ) : (
           <button
-            onClick={() => setStepIndex(0)}
+            onClick={() => setStepIndex(FIRST_STEP_INDEX)}
             className="text-xs px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
           >
             Restart
