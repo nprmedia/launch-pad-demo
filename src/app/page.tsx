@@ -1,16 +1,16 @@
 // File: src/app/page.tsx
-// Fully patched: hydration-safe walkthrough + strict section rendering + clarity
+// Rebuilt clean: hydration-safe, distinct wrapper, overlay isolated
 
 'use client';
 
+import { useEffect, useState } from 'react';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { LeadMagnetSection } from '@/components/sections/LeadMagnetSection';
 import { FeatureSection } from '@/components/sections/FeatureSection';
 import { SocialProofSection } from '@/components/sections/SocialProofSection';
 import { CTASection } from '@/components/sections/CTASection';
 import { FooterSection } from '@/components/sections/FooterSection';
-import { OverlayWalkthroughWrapper } from '@/components/overlay/OverlayWalkthroughWrapper';
-import { useEffect, useState } from 'react';
+import { OverlayWalkthroughWrapper, Wrapper } from '@/components/overlay/OverlayWalkthroughWrapper';
 
 export default function Page() {
   const [hydrated, setHydrated] = useState(false);
@@ -22,27 +22,39 @@ export default function Page() {
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <section id="hero-section">
-        <HeroSection />
+        <Wrapper>
+          <HeroSection />
+        </Wrapper>
       </section>
 
       <section id="lead-magnet-section">
-        <LeadMagnetSection />
+        <Wrapper>
+          <LeadMagnetSection />
+        </Wrapper>
       </section>
 
       <section id="feature-section">
-        <FeatureSection />
+        <Wrapper>
+          <FeatureSection />
+        </Wrapper>
       </section>
 
       <section id="social-proof-section">
-        <SocialProofSection />
+        <Wrapper>
+          <SocialProofSection />
+        </Wrapper>
       </section>
 
       <section id="cta-section">
-        <CTASection />
+        <Wrapper>
+          <CTASection />
+        </Wrapper>
       </section>
 
       <section id="footer-section">
-        <FooterSection />
+        <Wrapper>
+          <FooterSection />
+        </Wrapper>
       </section>
 
       {hydrated && <OverlayWalkthroughWrapper />}

@@ -1,18 +1,19 @@
 // File: components/overlay/OverlayWalkthroughWrapper.tsx
-// Purpose: Client-only wrapper to render dynamic OverlayWalkthrough with suspense
+// Exports both OverlayWalkthroughWrapper and Wrapper for layout
 
 'use client';
 
-import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
+import React from 'react';
+import { OverlayWalkthrough } from './OverlayWalkthrough';
 
-const OverlayWalkthrough = dynamic(() =>
-  import('./OverlayWalkthrough').then((mod) => mod.OverlayWalkthrough),
-  { ssr: false }
-);
+export const OverlayWalkthroughWrapper = () => {
+  return (
+    <div className="fixed inset-0 z-50 pointer-events-none">
+      <OverlayWalkthrough />
+    </div>
+  );
+};
 
-export const OverlayWalkthroughWrapper = () => (
-  <Suspense fallback={null}>
-    <OverlayWalkthrough />
-  </Suspense>
+export const Wrapper = ({ children }: { children: React.ReactNode }) => (
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">{children}</div>
 );
