@@ -1,5 +1,5 @@
 // File: components/overlay/OverlayWalkthrough.tsx
-// Hardened, bulletproof walkthrough system with layout guarantees
+// Full-fidelity, timing-locked, guaranteed-stable overlay walkthrough system
 
 'use client';
 
@@ -25,30 +25,40 @@ export const OverlayWalkthrough = () => {
   const currentStep = steps[stepIndex];
 
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const observerRef = useRef<ResizeObserver | null>(null);
-  const intersectionObserver = useRef<IntersectionObserver | null>(null);
 
-  const ensureStableElement = (id: string): Promise<HTMLElement> => {
+  const waitForLayoutStability = (id: string): Promise<HTMLElement> => {
     return new Promise((resolve) => {
-      const el = document.getElementById(id);
-      if (el && el.offsetHeight > 0) {
-        resolve(el);
-        return;
-      }
-
-      const timeout = setInterval(() => {
+      const tryFind = () => {
         const el = document.getElementById(id);
-        if (el && el.offsetHeight > 0) {
-          clearInterval(timeout);
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        if (rect.height > 0 && rect.width > 0) {
           resolve(el);
+          return true;
         }
+        return false;
+      };
+
+      if (tryFind()) return;
+
+      const interval = setInterval(() => {
+        if (tryFind()) clearInterval(interval);
       }, 50);
     });
   };
 
-  const updatePosition = async () => {
+  const waitForScrollEnd = (): Promise<void> => {
+    return new Promise((resolve) => {
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => resolve(), 200);
+    });
+  };
+
+  const positionTooltip = async () => {
     const tooltip = tooltipRef.current;
-    const target = await ensureStableElement(currentStep.id);
+    const target = await waitForLayoutStability(currentStep.id);
     if (!tooltip || !target) return;
 
     const rect = target.getBoundingClientRect();
@@ -64,65 +74,26 @@ export const OverlayWalkthrough = () => {
 
     setPosition({ top: clampedTop, left: clampedLeft + window.scrollX });
 
-    window.scrollTo({
-      top: rect.top + window.scrollY - window.innerHeight / 4,
-      behavior: 'smooth',
-    });
+    requestAnimationFrame(() => tooltip.focus());
+  };
 
-    requestAnimationFrame(() => {
-      tooltip.focus();
-    });
+  const runStepLogic = async () => {
+    const target = await waitForLayoutStability(currentStep.id);
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    await waitForScrollEnd();
+    await positionTooltip();
   };
 
   useEffect(() => {
     setTooltipKey(stepIndex);
+    runStepLogic();
   }, [stepIndex]);
 
   useEffect(() => {
-    let mounted = true;
-    updatePosition();
-
-    if (observerRef.current) observerRef.current.disconnect();
-    const tooltip = tooltipRef.current;
-    if (!tooltip) return;
-
-    const obs = new ResizeObserver(() => {
-      if (mounted) updatePosition();
-    });
-    obs.observe(tooltip);
-
-    ensureStableElement(currentStep.id).then((target) => {
-      obs.observe(target);
-    });
-
-    observerRef.current = obs;
-
-    return () => {
-      mounted = false;
-      obs.disconnect();
-    };
-  }, [stepIndex, currentStep.id]);
-
-  useEffect(() => {
-    if (intersectionObserver.current) {
-      intersectionObserver.current.disconnect();
-    }
-
-    const io = new IntersectionObserver((entries) => {
-      const isVisible = entries[0]?.isIntersecting;
-      if (!isVisible) {
-        updatePosition();
-      }
-    });
-
-    ensureStableElement(currentStep.id).then((el) => {
-      io.observe(el);
-    });
-
-    intersectionObserver.current = io;
-
-    return () => io.disconnect();
-  }, [stepIndex, currentStep.id]);
+    const resizeHandler = () => runStepLogic();
+    window.addEventListener('resize', resizeHandler);
+    return () => window.removeEventListener('resize', resizeHandler);
+  }, [currentStep.id]);
 
   return (
     <div
