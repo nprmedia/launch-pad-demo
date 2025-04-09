@@ -1,5 +1,5 @@
 // File: components/overlay/OverlayWalkthrough.tsx
-// Basic functional rebuild: 1 tooltip shown per section with navigation
+// Step 1: UI polish pass — spacing, shadows, mobile sizing, animation
 
 'use client';
 
@@ -26,27 +26,32 @@ export const OverlayWalkthrough = () => {
   }, [stepIndex]);
 
   return (
-    <div className="fixed z-50 bottom-10 left-1/2 transform -translate-x-1/2 bg-black text-white px-6 py-3 rounded-xl shadow-xl text-sm">
-      <div className="mb-2 font-semibold">{currentStep.label}</div>
-      <div className="flex justify-between">
+    <div
+      className="fixed z-50 bottom-8 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-4 rounded-2xl shadow-2xl text-sm max-w-md w-[90%] animate-fade-in"
+      style={{ animationDuration: '300ms' }}
+    >
+      <div className="mb-3 font-medium leading-tight text-center">
+        {currentStep.label}
+      </div>
+      <div className="flex justify-between gap-3">
         <button
           onClick={() => setStepIndex(Math.max(0, stepIndex - 1))}
           disabled={stepIndex === 0}
-          className="text-xs px-3 py-1 bg-white text-black rounded disabled:opacity-50"
+          className="text-xs px-4 py-1.5 bg-white text-black rounded-lg transition disabled:opacity-40"
         >
           Back
         </button>
         {stepIndex < steps.length - 1 ? (
           <button
             onClick={() => setStepIndex(stepIndex + 1)}
-            className="text-xs px-3 py-1 bg-blue-600 text-white rounded"
+            className="text-xs px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             Next
           </button>
         ) : (
           <button
             onClick={() => setStepIndex(0)}
-            className="text-xs px-3 py-1 bg-green-600 text-white rounded"
+            className="text-xs px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
           >
             Restart
           </button>
