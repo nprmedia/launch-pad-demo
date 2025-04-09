@@ -1,13 +1,9 @@
 // File: components/overlay/OverlayWalkthrough.tsx
-// Fully perfected + hardened overlay walkthrough system
+// Hardened, bulletproof walkthrough system with layout guarantees
 
 'use client';
 
-import React, {
-  useRef,
-  useState,
-  useEffect,
-} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const OFFSET_Y = 16;
 const MIN_TOP = 16;
@@ -27,61 +23,106 @@ export const OverlayWalkthrough = () => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [tooltipKey, setTooltipKey] = useState(0);
   const currentStep = steps[stepIndex];
+
   const tooltipRef = useRef<HTMLDivElement | null>(null);
-  const targetRef = useRef<HTMLElement | null>(null);
   const observerRef = useRef<ResizeObserver | null>(null);
+  const intersectionObserver = useRef<IntersectionObserver | null>(null);
 
-  // Sync tooltip position on step change and DOM resize
-  useEffect(() => {
+  const ensureStableElement = (id: string): Promise<HTMLElement> => {
+    return new Promise((resolve) => {
+      const el = document.getElementById(id);
+      if (el && el.offsetHeight > 0) {
+        resolve(el);
+        return;
+      }
+
+      const timeout = setInterval(() => {
+        const el = document.getElementById(id);
+        if (el && el.offsetHeight > 0) {
+          clearInterval(timeout);
+          resolve(el);
+        }
+      }, 50);
+    });
+  };
+
+  const updatePosition = async () => {
     const tooltip = tooltipRef.current;
-    const target = document.getElementById(currentStep.id);
-    if (!tooltip || !target || !tooltip.isConnected || !target.isConnected) return;
+    const target = await ensureStableElement(currentStep.id);
+    if (!tooltip || !target) return;
 
-    targetRef.current = target;
+    const rect = target.getBoundingClientRect();
+    const tooltipWidth = tooltip.offsetWidth || 300;
+    const tooltipHeight = tooltip.offsetHeight || 100;
 
-    requestAnimationFrame(() => tooltip?.focus());
+    const centeredLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
+    const clampedLeft = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, centeredLeft));
 
-    const updatePosition = () => {
-      const rect = target.getBoundingClientRect();
-      const tooltipWidth = tooltip.offsetWidth || 300;
-      const tooltipHeight = tooltip.offsetHeight || 100;
+    const rawTop = rect.bottom + OFFSET_Y + window.scrollY;
+    const maxTop = window.scrollY + window.innerHeight - tooltipHeight - 16;
+    const clampedTop = Math.max(MIN_TOP, Math.min(rawTop, maxTop));
 
-      const centeredLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
-      const clampedLeft = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, centeredLeft));
+    setPosition({ top: clampedTop, left: clampedLeft + window.scrollX });
 
-      const rawTop = rect.bottom + OFFSET_Y + window.scrollY;
-      const maxTop = window.scrollY + window.innerHeight - tooltipHeight - 16;
-      const clampedTop = Math.max(MIN_TOP, Math.min(rawTop, maxTop));
-
-      setPosition({ top: clampedTop, left: clampedLeft + window.scrollX });
-
-      window.scrollTo({
-        top: rect.top + window.scrollY - window.innerHeight / 4,
-        behavior: 'smooth',
-      });
-    };
-
-    if (observerRef.current) observerRef.current.disconnect();
-
-    const newObserver = new ResizeObserver(() => {
-      window.requestAnimationFrame(updatePosition);
+    window.scrollTo({
+      top: rect.top + window.scrollY - window.innerHeight / 4,
+      behavior: 'smooth',
     });
 
-    observerRef.current = newObserver;
-    if (tooltip.isConnected) newObserver.observe(tooltip);
-    if (target.isConnected) newObserver.observe(target);
+    requestAnimationFrame(() => {
+      tooltip.focus();
+    });
+  };
 
-    updatePosition();
-
-    return () => {
-      newObserver.disconnect();
-    };
-  }, [stepIndex, currentStep.id]);
-
-  // Force animation class to reapply per step
   useEffect(() => {
     setTooltipKey(stepIndex);
   }, [stepIndex]);
+
+  useEffect(() => {
+    let mounted = true;
+    updatePosition();
+
+    if (observerRef.current) observerRef.current.disconnect();
+    const tooltip = tooltipRef.current;
+    if (!tooltip) return;
+
+    const obs = new ResizeObserver(() => {
+      if (mounted) updatePosition();
+    });
+    obs.observe(tooltip);
+
+    ensureStableElement(currentStep.id).then((target) => {
+      obs.observe(target);
+    });
+
+    observerRef.current = obs;
+
+    return () => {
+      mounted = false;
+      obs.disconnect();
+    };
+  }, [stepIndex, currentStep.id]);
+
+  useEffect(() => {
+    if (intersectionObserver.current) {
+      intersectionObserver.current.disconnect();
+    }
+
+    const io = new IntersectionObserver((entries) => {
+      const isVisible = entries[0]?.isIntersecting;
+      if (!isVisible) {
+        updatePosition();
+      }
+    });
+
+    ensureStableElement(currentStep.id).then((el) => {
+      io.observe(el);
+    });
+
+    intersectionObserver.current = io;
+
+    return () => io.disconnect();
+  }, [stepIndex, currentStep.id]);
 
   return (
     <div
