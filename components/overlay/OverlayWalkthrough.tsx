@@ -3,7 +3,7 @@
 
 'use client';
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 const steps = [
   { id: 'hero-section', label: 'Welcome to the Hero Section' },
@@ -52,7 +52,7 @@ export const OverlayWalkthrough = () => {
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [stepIndex]);
+  }, [stepIndex, currentStep.id]);
 
   return (
     <div
