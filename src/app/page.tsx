@@ -1,7 +1,7 @@
 // File: src/app/page.tsx
 import React from 'react';
-import SymbolicStart from '@/components/overlay/SymbolicStart';
-
+import { OverlayWalkthroughWrapper } from '@/components/overlay/OverlayWalkthroughWrapper';
+  
 import { HeroSection } from '@/components/sections/HeroSection';
 import { LeadMagnetSection } from '@/components/sections/LeadMagnetSection';
 import { FeatureSection } from '@/components/sections/FeatureSection';
@@ -11,7 +11,7 @@ import { FooterSection } from '@/components/sections/FooterSection';
 
 export default function Page() {
   return (
-    <SymbolicStart>
+    <OverlayWalkthroughWrapper>
       <main className="flex flex-col items-center justify-center">
         <HeroSection />
         <LeadMagnetSection />
@@ -20,6 +20,6 @@ export default function Page() {
         <CTASection />
         <FooterSection />
       </main>
-    </SymbolicStart>
+    </OverlayWalkthroughWrapper>
   );
 }
