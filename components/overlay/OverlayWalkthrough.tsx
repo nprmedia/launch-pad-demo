@@ -16,9 +16,7 @@ const steps = [
 
 export const OverlayWalkthrough = () => {
   const [stepIndex, setStepIndex] = useState(0);
-  const [target, setTarget] = useState<HTMLElement | null>(null);
   const [elementVisible, setElementVisible] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 15;
   const currentStep = steps[stepIndex];
   const isKeyboardScroll = useRef(false);
@@ -48,7 +46,6 @@ export const OverlayWalkthrough = () => {
           observer.observe(el);
         } else if (retries < maxRetries) {
           retries++;
-          setRetryCount(retries);
           setTimeout(attempt, 250);
         } else {
           resolve(null);
@@ -59,12 +56,10 @@ export const OverlayWalkthrough = () => {
   };
 
   const runStepLogic = useCallback(async () => {
-    setTarget(null);
     setElementVisible(false);
     const el = await validateAndScrollToElement(currentStep.id);
     if (el) {
       requestAnimationFrame(() => {
-        setTarget(el);
         setElementVisible(true);
       });
     }

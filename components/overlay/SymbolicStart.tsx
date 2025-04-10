@@ -1,7 +1,6 @@
-// File: components/overlay/SymbolicStart.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Sparkles } from 'lucide-react';
 import { OverlayWalkthroughWrapper } from './OverlayWalkthroughWrapper';
 
@@ -12,12 +11,12 @@ interface SymbolicStartProps {
 export const SymbolicStart: React.FC<React.PropsWithChildren<SymbolicStartProps>> = ({ onStart, children }) => {
   const [started, setStarted] = useState(false);
 
-  const handleStart = () => {
+  const handleStart = useCallback(() => {
     setStarted(true);
     setTimeout(() => {
       onStart?.();
     }, 300);
-  };
+  }, [onStart]);
 
   useEffect(() => {
     const listener = (e: KeyboardEvent) => {
@@ -27,7 +26,7 @@ export const SymbolicStart: React.FC<React.PropsWithChildren<SymbolicStartProps>
     };
     window.addEventListener('keydown', listener);
     return () => window.removeEventListener('keydown', listener);
-  }, []);
+  }, [handleStart]);
 
   if (!started) {
     return (
@@ -45,10 +44,9 @@ export const SymbolicStart: React.FC<React.PropsWithChildren<SymbolicStartProps>
   }
 
   return (
-    <>
-        <OverlayWalkthroughWrapper />      
-        {children}
-    </>
+    <OverlayWalkthroughWrapper>
+      {children}
+    </OverlayWalkthroughWrapper>
   );
 };
 
