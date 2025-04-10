@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 export const FooterSection = () => {
   return (
-    <footer className="py-12 px-6 bg-black text-white text-center">
+    <footer id="footer-section" className="w-full min-h-screen flex items-center justify-center py-12 px-6 bg-black text-white text-center">
       <p className="text-sm text-white/60">Demo 1 of 9 – Coaches & Consultants</p>
       <p className="mt-1 text-white/80">Crafted by NPR Media</p>
 

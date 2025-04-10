@@ -1,160 +1,187 @@
 // File: components/overlay/OverlayWalkthrough.tsx
 'use client';
 
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useMemo,
-} from 'react';
-
-const OFFSET_Y = 16;
-const MIN_TOP = 16;
-const MAX_RETRIES = 30;
-const RETRY_DELAY = 100;
-const FIRST_STEP_INDEX = 0;
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { CheckCircle, RotateCw, Sparkles } from 'lucide-react';
+import clsx from 'clsx';
 
 const steps = [
-  { id: 'hero-section', label: 'Welcome to the Hero Section' },
-  { id: 'lead-magnet-section', label: 'Lead Magnet Explained' },
-  { id: 'feature-section', label: 'Core Features Overview' },
-  { id: 'social-proof-section', label: 'What Others Are Saying' },
-  { id: 'cta-section', label: 'Call to Action' },
-  { id: 'footer-section', label: 'Footer & Final Details' },
+  { id: 'hero-section', label: 'Hero', description: 'This is where we capture first impressions.' },
+  { id: 'lead-magnet-section', label: 'Lead Magnet', description: 'Highlight the value exchange for email capture.' },
+  { id: 'feature-section', label: 'Features', description: 'Communicate key offerings and benefits.' },
+  { id: 'social-proof-section', label: 'Social Proof', description: 'Build trust with testimonials and logos.' },
+  { id: 'cta-section', label: 'CTA', description: 'Prompt users with a strong next step.' },
+  { id: 'footer-section', label: 'Footer', description: 'Include links and secondary CTAs.' },
 ];
 
 export const OverlayWalkthrough = () => {
-  const [stepIndex, setStepIndex] = useState(FIRST_STEP_INDEX);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
-  const tooltipRef = useRef<HTMLDivElement | null>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const activeRef = useRef(true);
+  const [stepIndex, setStepIndex] = useState(0);
+  const [target, setTarget] = useState<HTMLElement | null>(null);
+  const [elementVisible, setElementVisible] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 15;
+  const currentStep = steps[stepIndex];
+  const isKeyboardScroll = useRef(false);
 
-  const currentStep = useMemo(() => steps[Math.max(0, Math.min(stepIndex, steps.length - 1))], [stepIndex]);
-
-  const waitForLayoutStability = useCallback((id: string): Promise<HTMLElement> => {
-    return new Promise((resolve, reject) => {
-      let attempts = 0;
-
-      const tryFind = () => {
-        if (!activeRef.current) return;
-
-        const el = document.getElementById(id);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          const style = window.getComputedStyle(el);
-          const visible = style.display !== 'none' && rect.width > 0 && rect.height > 0;
-          if (visible) return resolve(el);
-        }
-
-        if (++attempts > MAX_RETRIES) return reject(new Error(`Element #${id} not found or not visible`));
-        setTimeout(tryFind, RETRY_DELAY);
-      };
-
-      tryFind();
-    });
-  }, []);
-
-  const waitForScrollEnd = useCallback((): Promise<void> => {
+  const validateAndScrollToElement = async (stepId: string): Promise<HTMLElement | null> => {
+    let retries = 0;
     return new Promise((resolve) => {
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-      scrollTimeoutRef.current = setTimeout(() => resolve(), 300);
+      const attempt = () => {
+        const el = document.getElementById(stepId);
+        if (el && el.offsetHeight > 0) {
+          const rect = el.getBoundingClientRect();
+          const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+
+          if (!isVisible && isKeyboardScroll.current) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+
+          const observer = new IntersectionObserver(
+            ([entry]) => {
+              if (entry.isIntersecting) {
+                observer.disconnect();
+                resolve(el);
+              }
+            },
+            { threshold: 0.5 }
+          );
+          observer.observe(el);
+        } else if (retries < maxRetries) {
+          retries++;
+          setRetryCount(retries);
+          setTimeout(attempt, 250);
+        } else {
+          resolve(null);
+        }
+      };
+      attempt();
     });
-  }, []);
-
-  const positionTooltip = useCallback(async () => {
-    if (!tooltipRef.current) return;
-
-    const target = await waitForLayoutStability(currentStep.id).catch(() => null);
-    if (!target || !tooltipRef.current) return;
-
-    const rect = target.getBoundingClientRect();
-    const tooltip = tooltipRef.current;
-    const tooltipWidth = tooltip.offsetWidth || 320;
-    const tooltipHeight = tooltip.offsetHeight || 120;
-
-    const scrollBarOffset = window.innerWidth - document.documentElement.clientWidth;
-    const centeredLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
-    const clampedLeft = Math.max(16, Math.min(window.innerWidth - tooltipWidth - scrollBarOffset - 16, centeredLeft));
-
-    const rawTop = rect.bottom + OFFSET_Y + window.scrollY;
-    const maxTop = window.scrollY + window.innerHeight - tooltipHeight - 16;
-    const clampedTop = Math.max(MIN_TOP, Math.min(rawTop, maxTop));
-
-    setPosition({ top: clampedTop, left: clampedLeft + window.scrollX });
-
-    if (document.visibilityState === 'visible') {
-      requestAnimationFrame(() => tooltip?.focus());
-    }
-  }, [currentStep.id, waitForLayoutStability]);
+  };
 
   const runStepLogic = useCallback(async () => {
-    try {
-      const target = await waitForLayoutStability(currentStep.id);
-      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      await new Promise(requestAnimationFrame);
-      await waitForScrollEnd();
-      await positionTooltip();
-    } catch (error) {
-      console.error('Walkthrough step failed:', error);
+    setTarget(null);
+    setElementVisible(false);
+    const el = await validateAndScrollToElement(currentStep.id);
+    if (el) {
+      requestAnimationFrame(() => {
+        setTarget(el);
+        setElementVisible(true);
+      });
     }
-  }, [currentStep.id, waitForLayoutStability, waitForScrollEnd, positionTooltip]);
+  }, [currentStep.id]);
 
   useEffect(() => {
     runStepLogic();
-  }, [stepIndex, runStepLogic]);
-
-  useEffect(() => {
-    const resizeHandler = () => requestAnimationFrame(runStepLogic);
-    window.addEventListener('resize', resizeHandler);
-    return () => window.removeEventListener('resize', resizeHandler);
   }, [runStepLogic]);
 
   useEffect(() => {
-    return () => {
-      activeRef.current = false;
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') {
+        isKeyboardScroll.current = true;
+        setStepIndex((i) => Math.min(i + 1, steps.length - 1));
+      } else if (e.key === 'ArrowLeft') {
+        isKeyboardScroll.current = true;
+        setStepIndex((i) => Math.max(i - 1, 0));
+      } else if (e.key === 'Escape') {
+        setElementVisible(false);
+      }
     };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const index = steps.findIndex((step) => step.id === entry.target.id);
+          if (index !== -1 && entry.isIntersecting) {
+            isKeyboardScroll.current = false;
+            setStepIndex(index);
+          }
+        }
+      },
+      { threshold: 0.6 }
+    );
+
+    steps.forEach((step) => {
+      const el = document.getElementById(step.id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
-    <div
-      ref={tooltipRef}
-      role="dialog"
-      aria-live="polite"
-      aria-labelledby="walkthrough-title"
-      className="fixed z-[9999] bg-black text-white px-6 py-4 rounded-2xl shadow-2xl text-sm max-w-md w-[90%] animate-fade-in transition-all duration-300 focus:outline-none"
-      style={{ top: position.top, left: position.left }}
-      tabIndex={0}
-    >
-      <div id="walkthrough-title" className="mb-3 font-medium leading-tight text-center">
-        {currentStep.label}
+    <>
+      {elementVisible && (
+        <div className="fixed inset-x-0 bottom-16 z-[9999] flex justify-center px-4 animate-tooltip-bloom">
+          <div className="relative w-full max-w-2xl px-6 py-4 rounded-3xl backdrop-blur-xl bg-white/50 dark:bg-slate-900/60 border border-white/20 shadow-[0_8px_30px_rgba(0,0,0,0.12)] ring-2 ring-blue-400">
+            <div className="flex justify-between items-center mb-3 text-xs text-gray-200 dark:text-gray-300">
+              <span className="flex items-center gap-1">
+                <CheckCircle size={14} className="text-blue-400 drop-shadow" /> Step {stepIndex + 1} of {steps.length}
+              </span>
+              <span className="text-gray-400">Use ← / → to navigate</span>
+            </div>
+            <div className="flex items-center justify-center gap-3 mb-1 relative">
+              <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
+                <div className="w-24 h-24 rounded-full bg-blue-500/30 blur-2xl animate-pulse" />
+              </div>
+              <Sparkles size={20} className="text-blue-400 animate-pulse drop-shadow-sm z-10" />
+              <p className="font-extrabold text-3xl text-center text-slate-900 dark:text-white tracking-wide z-10">
+                {currentStep.label}
+              </p>
+            </div>
+            <p className="text-base text-center mt-2 text-gray-800 dark:text-slate-300 leading-relaxed max-w-prose mx-auto font-light z-10">
+              {currentStep.description}
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="fixed top-1/2 right-6 transform -translate-y-1/2 flex flex-col items-center gap-2 z-[9999]">
+        {steps.map((_, i) => (
+          <div key={i} className="flex flex-col items-center">
+            <div
+              className={clsx(
+                'w-3 h-3 rounded-full transition-all duration-300 z-10',
+                i === stepIndex ? 'bg-blue-600 scale-125 shadow-md' : 'bg-gray-300'
+              )}
+            />
+            {i !== steps.length - 1 && <div className="w-0.5 h-5 bg-gray-300" />}
+          </div>
+        ))}
       </div>
-      <div className="flex justify-between gap-3">
-        <button
-          onClick={() => setStepIndex(Math.max(0, stepIndex - 1))}
-          disabled={stepIndex === 0}
-          className="text-xs px-4 py-1.5 bg-white text-black rounded-lg transition disabled:opacity-40"
-        >
-          Back
-        </button>
-        {stepIndex < steps.length - 1 ? (
-          <button
-            onClick={() => setStepIndex(stepIndex + 1)}
-            className="text-xs px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Next
-          </button>
-        ) : (
-          <button
-            onClick={() => setStepIndex(FIRST_STEP_INDEX)}
-            className="text-xs px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-          >
-            Restart
-          </button>
-        )}
-      </div>
-    </div>
+
+      <button
+        className="fixed bottom-6 left-6 z-[9999] bg-white/80 hover:bg-white/90 text-xs text-black px-4 py-2 rounded-full flex items-center gap-1 shadow-lg border border-gray-300"
+        onClick={() => {
+          isKeyboardScroll.current = true;
+          setStepIndex(0);
+        }}
+      >
+        <RotateCw size={14} /> Restart
+      </button>
+
+      <style jsx global>{`
+        @keyframes tooltip-bloom {
+          0% {
+            transform: scale(0.6);
+            opacity: 0;
+            filter: blur(6px);
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+            filter: blur(0);
+          }
+        }
+        .animate-tooltip-bloom {
+          animation: tooltip-bloom 0.5s ease-out forwards;
+        }
+      `}</style>
+    </>
   );
 };
+
+export default OverlayWalkthrough;

@@ -29,7 +29,7 @@ const logos = [
 
 export const SocialProofSection = () => {
   return (
-    <section id="social-proof-section" className="py-24 px-6 bg-gray-50 dark:bg-gray-950">
+    <section id="social-proof-section" className="w-full min-h-screen flex items-center justify-center py-24 px-6 bg-gray-50 dark:bg-gray-950">
       <div className="max-w-6xl mx-auto text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

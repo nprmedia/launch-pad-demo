@@ -26,7 +26,7 @@ export const LeadMagnetSection = () => {
   };
 
   return (
-    <section className="py-20 px-6 bg-gray-50 dark:bg-gray-900 text-center" id="lead-magnet-section">
+    <section className="w-full min-h-screen flex items-center justify-centerpy-20 px-6 bg-gray-50 dark:bg-gray-900 text-center" id="lead-magnet-section">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}

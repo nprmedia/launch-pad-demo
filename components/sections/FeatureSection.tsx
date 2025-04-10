@@ -29,7 +29,7 @@ const features = [
 
 export const FeatureSection = () => {
   return (
-    <section id="feature-section" className="py-24 px-6 bg-white dark:bg-black">
+    <section id="feature-section" className="w-full min-h-screen flex items-center justify-center py-24 px-6 bg-white dark:bg-black">
       <div className="max-w-6xl mx-auto text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

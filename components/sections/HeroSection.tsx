@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 
 export const HeroSection = () => {
   return (
-    <section id="hero-section" className="relative isolate min-h-screen flex flex-col items-center justify-center px-6 text-center bg-white dark:bg-black overflow-hidden">
+    <section id="hero-section" className="relative isolate w-full min-h-screen flex flex-col items-center justify-center px-6 text-center bg-white dark:bg-black overflow-hidden">
       <div className="absolute top-[-100px] left-1/2 transform -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-brand opacity-10 blur-[120px] z-0" />
 
       <motion.div

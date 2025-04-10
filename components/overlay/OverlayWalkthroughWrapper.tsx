@@ -1,17 +1,27 @@
-// File: components/overlay/OverlayWalkthroughWrapper.tsx
-// Minimal wrapper to position the walkthrough component cleanly
-
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { OverlayWalkthrough } from './OverlayWalkthrough';
 
-export const OverlayWalkthroughWrapper = () => {
+interface OverlayWalkthroughWrapperProps {
+  children: React.ReactNode;
+}
+
+export const OverlayWalkthroughWrapper: React.FC<OverlayWalkthroughWrapperProps> = ({ children }) => {
+  const [showOverlay, setShowOverlay] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowOverlay(true);
+    }, 500); // slight delay to allow layout stabilization
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none">
-      <div className="pointer-events-auto">
-        <OverlayWalkthrough />
-      </div>
+    <div className="relative">
+      {children}
+      {showOverlay && <OverlayWalkthrough />}
     </div>
   );
 };

@@ -30,7 +30,7 @@ export const FAQSection = () => {
   };
 
   return (
-    <section className="py-24 px-6 bg-white dark:bg-black">
+    <section className="w-full min-h-screen flex items-center justify-center py-24 px-6 bg-white dark:bg-black">
       <div className="max-w-3xl mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
           Frequently Asked Questions
