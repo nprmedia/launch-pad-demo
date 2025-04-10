@@ -18,6 +18,15 @@ const config: Config = {
       boxShadow: {
         glow: '0 0 40px rgba(105, 65, 198, 0.5)',
       },
+      animation: {
+        orbit: 'orbit 6s linear infinite',
+      },
+      keyframes: {
+        orbit: {
+          '0%': { transform: 'rotate(0deg) translateX(100px) rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg) translateX(100px) rotate(-360deg)' },
+        },
+      },
     },
   },
   plugins: [],

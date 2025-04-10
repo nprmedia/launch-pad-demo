@@ -1,5 +1,6 @@
 'use client';
 
+import { Orb } from '@/components/overlay/Orb';
 import { useEffect, useState, useCallback } from 'react';
 import { Sparkles } from 'lucide-react';
 import clsx from 'clsx';
@@ -18,10 +19,9 @@ export const SymbolicStart = ({ onStart }: SymbolicStartProps) => {
     setTimeout(() => {
       setVisible(false);
       onStart();
-    }, 1200); // match fade-out transition
+    }, 1200);
   }, [visible, onStart]);
 
-  // Allow Enter or Spacebar to unlock
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -41,31 +41,24 @@ export const SymbolicStart = ({ onStart }: SymbolicStartProps) => {
         fading ? 'opacity-0' : 'opacity-100'
       )}
     >
-      {/* Background aura */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-950 via-purple-950 to-black opacity-90 animate-background-pulse pointer-events-none" />
+      {/* Background gradient aura */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-950 via-purple-950 to-black opacity-90 animate-background-pulse pointer-events-none z-[1]" />
 
-      {/* Faint brand initials in background */}
-      <div className="absolute text-[30vw] text-white/5 font-extrabold tracking-widest select-none pointer-events-none">
+      {/* Blackout isolation layer */}
+      <div className="absolute inset-0 bg-black z-[2]" />
+
+      {/* Faint brand initials */}
+      <div className="absolute text-[30vw] text-white/5 font-extrabold tracking-widest select-none pointer-events-none z-[3]">
         NPR
       </div>
 
-      {/* Spark trail layer */}
-      <div className="absolute inset-0 pointer-events-none z-[1]">
-        {/* Optional: Add spark Lottie or SVG particles here */}
+      {/* Optional spark trail layer */}
+      <div className="absolute inset-0 pointer-events-none z-[3]">
+        {/* Lottie spark trails or SVG effects go here */}
       </div>
 
-      {/* Orb */}
-      <div
-        onClick={triggerStart}
-        className="relative z-[5] w-48 h-48 rounded-full bg-white/10 border-2 border-white/20 backdrop-blur-3xl flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-105 hover:ring-4 ring-blue-500 shadow-[0_0_80px_rgba(0,195,255,0.4)] animate-shimmer-glow group"
-      >
-        {/* Inner Sparkles Icon */}
-        <Sparkles className="h-12 w-12 text-blue-200 animate-slow-pulse transition-all group-hover:scale-110 group-hover:text-white" />
-
-        {/* Ripple Effect */}
-        <div className="absolute w-full h-full rounded-full border border-blue-300/40 animate-ping" />
-        <div className="absolute w-full h-full rounded-full border border-blue-300/20 animate-ping delay-200" />
-      </div>
+      {/* Central orb */}
+      <Orb onClick={triggerStart} />
 
       {/* Subtext */}
       <div className="absolute bottom-24 text-center text-white text-sm tracking-wide z-[5]">
@@ -75,7 +68,8 @@ export const SymbolicStart = ({ onStart }: SymbolicStartProps) => {
 
       {/* Cursor Glow */}
       <div className="fixed w-16 h-16 bg-blue-500/10 rounded-full blur-xl pointer-events-none z-[0] transition-all duration-300 ease-in-out animate-cursor-glow" />
-      
+
+      {/* Global Styles */}
       <style jsx global>{`
         @keyframes background-pulse {
           0%, 100% { background-position: 0% 50%; }
