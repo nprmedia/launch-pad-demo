@@ -16,7 +16,7 @@ type Props = {
   timestamp: string;
 };
 
-export const OverlayDebugPanel = ({
+export const DebugPanel = ({
   stepId,
   tooltipTop,
   tooltipLeft,

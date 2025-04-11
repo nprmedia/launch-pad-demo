@@ -1,9 +1,11 @@
+// File: components/overlay/Orb.tsx
+
 'use client';
 
-import { useEffect, useRef } from 'react';
-import Lottie from 'lottie-react';
-import swirlAnimation from '@/animations/swirl-core.json'; // Lottie JSON file
-import { Sparkles } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+
+// Replace this with your iconic SVG animation or inline SVG component
+import { NPRSigil } from '@/components/overlay/NPRSigil';
 
 type OrbProps = {
   onClick: () => void;
@@ -11,6 +13,7 @@ type OrbProps = {
 
 export const Orb = ({ onClick }: OrbProps) => {
   const orbRef = useRef<HTMLDivElement>(null);
+  const [particles, setParticles] = useState<{ top: string; left: string; delay: string }[]>([]);
 
   useEffect(() => {
     const node = orbRef.current;
@@ -27,37 +30,59 @@ export const Orb = ({ onClick }: OrbProps) => {
     return () => window.removeEventListener('mousemove', handleMove);
   }, []);
 
+  useEffect(() => {
+    const newParticles = Array.from({ length: 6 }, () => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 5}s`,
+    }));
+    setParticles(newParticles);
+  }, []);
+
   return (
     <div
       ref={orbRef}
       onClick={onClick}
-      className="relative w-52 h-52 rounded-full bg-white/5 backdrop-blur-xl border-2 border-white/20 shadow-[0_0_60px_rgba(0,200,255,0.5)] cursor-pointer transition-transform hover:scale-105 z-50 group"
+      className="relative w-52 h-52 rounded-full bg-gradient-to-br from-blue-900/30 to-purple-900/20 backdrop-blur-2xl border-2 border-white/10 shadow-[0_0_60px_rgba(0,200,255,0.4)] cursor-pointer transition-transform hover:scale-105 z-50 group"
     >
-      {/* Orb inner swirling core */}
+      {/* Inner animated sigil */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
-        <Lottie
-          animationData={swirlAnimation}
-          loop
-          autoplay
-          className="w-28 h-28 opacity-90"
+        <NPRSigil className="w-20 h-20 text-blue-300 opacity-90 animate-sigil-pulse" />
+      </div>
+
+      {/* Center Text */}
+      <div className="absolute bottom-3 inset-x-0 text-center text-xs text-white/70 tracking-wide z-10 font-mono uppercase">
+        The Ritual Begins
+      </div>
+
+      {/* Particle motes */}
+      {particles.map((p, i) => (
+        <div
+          key={i}
+          className="absolute w-1.5 h-1.5 bg-cyan-400/40 rounded-full animate-particle-blink"
+          style={{ top: p.top, left: p.left, animationDelay: p.delay }}
         />
-      </div>
+      ))}
 
-      {/* Faint icon fallback */}
-      <div className="absolute inset-0 flex items-center justify-center z-0">
-        <Sparkles className="w-10 h-10 text-blue-300 opacity-20 animate-pulse" />
-      </div>
+      {/* Aura pulse rings */}
+      <div className="absolute inset-0 rounded-full border border-blue-300/20 animate-ping" />
+      <div className="absolute inset-0 rounded-full border border-indigo-300/20 animate-ping delay-300" />
 
-      {/* Runes or orbiting glyphs */}
-      <div className="absolute w-full h-full rounded-full z-20 pointer-events-none">
-        <div className="absolute w-4 h-4 bg-blue-300/50 rounded-full top-1/2 left-0 animate-orbit" />
-        <div className="absolute w-3 h-3 bg-purple-300/50 rounded-full top-1/2 right-0 animate-orbit reverse delay-1000" />
-        <div className="absolute w-3.5 h-3.5 bg-cyan-300/50 rounded-full bottom-0 left-1/2 animate-orbit" />
-      </div>
-
-      {/* Double aura pulse rings */}
-      <div className="absolute inset-0 rounded-full border border-blue-400/20 animate-ping" />
-      <div className="absolute inset-0 rounded-full border border-cyan-400/20 animate-ping delay-300" />
+      <style jsx global>{`
+        @keyframes sigil-pulse {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.1);
+            opacity: 0.9;
+          }
+        }
+        .animate-sigil-pulse {
+          animation: sigil-pulse 3s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 };

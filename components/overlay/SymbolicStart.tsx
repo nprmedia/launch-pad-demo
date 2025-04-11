@@ -1,13 +1,13 @@
+// File: components/overlay/SymbolicStart.tsx
 'use client';
 
-import { Orb } from '@/components/overlay/Orb';
 import { useEffect, useState, useCallback } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Orb } from './Orb';
 import clsx from 'clsx';
 
-type SymbolicStartProps = {
+interface SymbolicStartProps {
   onStart: () => void;
-};
+}
 
 export const SymbolicStart = ({ onStart }: SymbolicStartProps) => {
   const [visible, setVisible] = useState(true);
@@ -24,9 +24,7 @@ export const SymbolicStart = ({ onStart }: SymbolicStartProps) => {
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        triggerStart();
-      }
+      if (e.key === 'Enter' || e.key === ' ') triggerStart();
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
@@ -41,35 +39,37 @@ export const SymbolicStart = ({ onStart }: SymbolicStartProps) => {
         fading ? 'opacity-0' : 'opacity-100'
       )}
     >
-      {/* Background gradient aura */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-950 via-purple-950 to-black opacity-90 animate-background-pulse pointer-events-none z-[1]" />
+      {/* Animated Flow Field Background */}
+      <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900 via-indigo-700 to-purple-900 opacity-40 animate-flowfield" />
+      </div>
 
-      {/* Blackout isolation layer */}
+      {/* Isolation Layer */}
       <div className="absolute inset-0 bg-black z-[2]" />
 
-      {/* Faint brand initials */}
+      {/* Subliminal Branding */}
       <div className="absolute text-[30vw] text-white/5 font-extrabold tracking-widest select-none pointer-events-none z-[3]">
         NPR
       </div>
 
-      {/* Optional spark trail layer */}
+      {/* Ambient Glow Glyphs */}
       <div className="absolute inset-0 pointer-events-none z-[3]">
-        {/* Lottie spark trails or SVG effects go here */}
+        {/* Reserved for particle ambient or glow effects */}
       </div>
 
-      {/* Central orb */}
+      {/* Core Orb */}
       <Orb onClick={triggerStart} />
 
-      {/* Subtext */}
+      {/* Subtext Prompt */}
       <div className="absolute bottom-24 text-center text-white text-sm tracking-wide z-[5]">
         This is not an ordinary page.<br />
         Press <kbd className="px-1 py-0.5 bg-white/10 border border-white/20 rounded text-xs">Enter</kbd> or click the orb to begin.
       </div>
 
-      {/* Cursor Glow */}
+      {/* Cursor Glow Trail */}
       <div className="fixed w-16 h-16 bg-blue-500/10 rounded-full blur-xl pointer-events-none z-[0] transition-all duration-300 ease-in-out animate-cursor-glow" />
 
-      {/* Global Styles */}
+      {/* Global Animations */}
       <style jsx global>{`
         @keyframes background-pulse {
           0%, 100% { background-position: 0% 50%; }
@@ -79,22 +79,18 @@ export const SymbolicStart = ({ onStart }: SymbolicStartProps) => {
           0%, 100% { box-shadow: 0 0 80px rgba(0, 195, 255, 0.4); }
           50% { box-shadow: 0 0 100px rgba(0, 255, 255, 0.7); }
         }
-        @keyframes slow-pulse {
-          0%, 100% { opacity: 0.9; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.08); }
+        @keyframes cursor-glow {
+          0%, 100% { opacity: 0.2; }
+          50% { opacity: 0.5; }
         }
-        .animate-background-pulse {
-          animation: background-pulse 10s ease infinite;
+        @keyframes flowfield {
+          0% { transform: scale(1) rotate(0deg); }
+          50% { transform: scale(1.05) rotate(1deg); }
+          100% { transform: scale(1) rotate(0deg); }
         }
-        .animate-shimmer-glow {
-          animation: shimmer-glow 3s ease-in-out infinite;
-        }
-        .animate-slow-pulse {
-          animation: slow-pulse 2.5s ease-in-out infinite;
-        }
-        .animate-cursor-glow {
-          animation: shimmer-glow 5s ease-in-out infinite;
-        }
+        .animate-background-pulse { animation: background-pulse 12s ease infinite; }
+        .animate-cursor-glow { animation: cursor-glow 4s ease-in-out infinite; }
+        .animate-flowfield { animation: flowfield 20s ease-in-out infinite; }
       `}</style>
     </div>
   );

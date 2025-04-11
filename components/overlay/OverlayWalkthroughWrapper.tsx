@@ -1,25 +1,22 @@
+// Wrapper for symbolic start and walkthrough overlay
 'use client';
 
-import React, { useState } from 'react';
-import { OverlayWalkthrough } from './OverlayWalkthrough';
+import { useState } from 'react';
 import { SymbolicStart } from './SymbolicStart';
+import { OverlayWalkthrough } from './OverlayWalkthrough';
 
-interface OverlayWalkthroughWrapperProps {
+type WrapperProps = {
   children: React.ReactNode;
-}
+};
 
-export const OverlayWalkthroughWrapper: React.FC<OverlayWalkthroughWrapperProps> = ({ children }) => {
-  const [unlocked, setUnlocked] = useState(false);
+export const OverlayWalkthroughWrapper = ({ children }: WrapperProps) => {
+  const [started, setStarted] = useState(false);
 
   return (
-    <div className="relative">
+    <>
+      {!started && <SymbolicStart onStart={() => setStarted(true)} />}
+      {started && <OverlayWalkthrough />}
       {children}
-
-      {!unlocked && (
-        <SymbolicStart onStart={() => setUnlocked(true)} />
-      )}
-
-      {unlocked && <OverlayWalkthrough />}
-    </div>
+    </>
   );
 };
