@@ -9,9 +9,8 @@ import { RestartButton } from './RestartButton';
 import { useOverlaySteps } from '@/lib/useOverlaySteps';
 
 export const OverlayWalkthrough = () => {
-  const steps = useOverlaySteps();
+  const steps: { id: string; label: string; description: string; statNumber?: string; statDescription?: string }[] = useOverlaySteps();
   const [stepIndex, setStepIndex] = useState(0);
-  const [elementVisible, setElementVisible] = useState(false);
   const isKeyboardScroll = useRef(false);
   const currentStep = steps[stepIndex];
 
@@ -53,34 +52,38 @@ export const OverlayWalkthrough = () => {
   };
 
   const runStepLogic = useCallback(async () => {
-    setElementVisible(false);
-    const el = await validateAndScrollToElement(currentStep.id);
-    if (el) {
-      requestAnimationFrame(() => {
-        setElementVisible(true);
-      });
-    }
+    await validateAndScrollToElement(currentStep.id);
   }, [currentStep.id]);
-
-  useEffect(() => {
-    runStepLogic();
-  }, [runStepLogic]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') {
         isKeyboardScroll.current = true;
-        setStepIndex((i) => Math.min(i + 1, steps.length - 1));
+        setStepIndex((i) => {
+          const newIndex = Math.min(i + 1, steps.length - 1);
+          setTimeout(() => {
+            validateAndScrollToElement(steps[newIndex].id);
+          }, 0);
+          return newIndex;
+        });
       } else if (e.key === 'ArrowLeft') {
         isKeyboardScroll.current = true;
-        setStepIndex((i) => Math.max(i - 1, 0));
+        setStepIndex((i) => {
+          const newIndex = Math.max(i - 1, 0);
+          setTimeout(() => {
+            validateAndScrollToElement(steps[newIndex].id);
+          }, 0);
+          return newIndex;
+        });
       } else if (e.key === 'Escape') {
-        setElementVisible(false);
+        // escape functionality (optional)
       }
     };
 
     window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    return () => {
+      window.removeEventListener('keydown', handler);
+    };
   }, [steps.length]);
 
   useEffect(() => {
@@ -106,14 +109,18 @@ export const OverlayWalkthrough = () => {
   }, [steps]);
 
   return (
-    <>
-      {elementVisible && <TooltipCard stepIndex={stepIndex} />}
-      <ProgressIndicator stepIndex={stepIndex} />
-      <RestartButton onRestart={() => {
-        isKeyboardScroll.current = true;
-        setStepIndex(0);
-      }} />
-    </>
+    <div className="fixed top-0 left-0 w-full h-full z-[9989] pointer-events-none">
+      <div className="absolute top-4 right-4 space-y-3 pointer-events-auto">
+        <TooltipCard key={`tooltip-${stepIndex}`} stepIndex={stepIndex} />
+        <ProgressIndicator stepIndex={stepIndex} />
+        <RestartButton
+          onRestart={() => {
+            isKeyboardScroll.current = true;
+            setStepIndex(0);
+          }}
+        />
+      </div>
+    </div>
   );
 };
 
