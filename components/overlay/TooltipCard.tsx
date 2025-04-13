@@ -30,22 +30,6 @@ export const TooltipCard = ({ stepIndex }: TooltipCardProps) => {
           transition={{ delay: 0.2, duration: 0.4, ease: 'easeOut' }}
         >
 
-          {/* Title with Aura */}
-          <div className="flex items-center justify-start gap-2 mb-3 relative">
-            <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
-              <motion.div
-                initial={{ opacity: 0.3 }}
-                animate={{ opacity: 0.06 }}
-                transition={{ duration: 5, ease: 'easeOut' }}
-                className="w-16 h-16 rounded-full bg-amber-400/30 blur-2xl"
-              />
-            </div>
-            <Sparkles size={16} className="text-amber-500 drop-shadow-sm z-10" />
-            <p className="font-semibold text-lg text-gray-900 tracking-wide z-10">
-              {currentStep.label}
-            </p>
-          </div>
-
           {/* Stat Row with Stat Number + Divider */}
           {currentStep.statNumber && currentStep.statDescription && (
             <div className="flex items-start gap-3 mt-2 mb-2 text-left">
@@ -55,7 +39,7 @@ export const TooltipCard = ({ stepIndex }: TooltipCardProps) => {
                   initial={{ scale: 0.95, opacity: 0.8 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.5 }}
-                  className="text-4xl font-bold text-amber-500 tracking-tight relative"
+                  className="text-4xl font-extrabold text-amber-500 tracking-tight relative"
                 >
                   <span className="absolute inset-0 -z-10 pointer-events-none" aria-hidden>
                     <span className="absolute inset-0 rounded-full bg-amber-300/30 blur-lg animate-[ping_4s_ease-out_infinite]" />
@@ -63,8 +47,8 @@ export const TooltipCard = ({ stepIndex }: TooltipCardProps) => {
                   {currentStep.statNumber}
                 </motion.span>
               </div>
-              <div className="h-10 w-px bg-amber-200 opacity-40" />
-              <p className="text-sm font-normal text-gray-700 leading-snug pt-0.5">
+              <div className="h-11 w-1 bg-amber-500" />
+              <p className="text-base font text-gray-700 leading-snug pt-0.5">
                 {currentStep.statDescription}
               </p>
             </div>
@@ -76,7 +60,7 @@ export const TooltipCard = ({ stepIndex }: TooltipCardProps) => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="text-sm text-left mt-5 text-gray-600 leading-relaxed max-w-prose mx-auto font-normal z-10 pt-4 border-t border-gray-100"
+            className="text-xs text-left mt-5 text-gray-600 leading-relaxed max-w-prose mx-auto font-normal z-10 pt-4 border-t border-gray-100"
           >
             {currentStep.description}
           </motion.p>

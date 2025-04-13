@@ -6,13 +6,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { TooltipCard } from './TooltipCard';
 import { ProgressIndicator } from './ProgressIndicator';
 import { RestartButton } from './RestartButton';
+import { WarningOverlay } from './WarningOverlay';
 import { useOverlaySteps } from '@/lib/useOverlaySteps';
 
 export const OverlayWalkthrough = () => {
-  const steps: { id: string; label: string; description: string; statNumber?: string; statDescription?: string }[] = useOverlaySteps();
+  const [acknowledged, setAcknowledged] = useState(false);
+  const steps: { id: string; description: string; statNumber?: string; statDescription?: string }[] = useOverlaySteps();
   const [stepIndex, setStepIndex] = useState(0);
   const isKeyboardScroll = useRef(false);
-  
+
   const validateAndScrollToElement = async (stepId: string): Promise<HTMLElement | null> => {
     return new Promise((resolve) => {
       let retries = 0;
@@ -50,7 +52,7 @@ export const OverlayWalkthrough = () => {
     });
   };
 
-    useEffect(() => {
+  useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') {
         isKeyboardScroll.current = true;
@@ -66,8 +68,6 @@ export const OverlayWalkthrough = () => {
           void validateAndScrollToElement(steps[newIndex].id);
           return newIndex;
         });
-      } else if (e.key === 'Escape') {
-        // escape functionality (optional)
       }
     };
 
@@ -100,18 +100,21 @@ export const OverlayWalkthrough = () => {
   }, [steps]);
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full z-[9989] pointer-events-none">
-      <div className="absolute top-4 right-4 space-y-3 pointer-events-auto">
-        <TooltipCard key={`tooltip-${stepIndex}`} stepIndex={stepIndex} />
-        <ProgressIndicator stepIndex={stepIndex} />
-        <RestartButton
-          onRestart={() => {
-            isKeyboardScroll.current = true;
-            setStepIndex(0);
-          }}
-        />
-      </div>
-    </div>
+    <>
+      {!acknowledged && <WarningOverlay onAcknowledge={() => setAcknowledged(true)} />}
+      {acknowledged && (
+        <div className="absolute top-4 right-4 space-y-3 pointer-events-auto">
+          <TooltipCard key={`tooltip-${stepIndex}`} stepIndex={stepIndex} />
+          <ProgressIndicator stepIndex={stepIndex} />
+          <RestartButton
+            onRestart={() => {
+              isKeyboardScroll.current = true;
+              setStepIndex(0);
+            }}
+          />
+        </div>
+      )}
+    </>
   );
 };
 

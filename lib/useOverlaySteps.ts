@@ -26,7 +26,7 @@ export const steps = [
     id: "social-proof-section",
     label: "Social Proof",
     statNumber: "4x",
-    statDescription: "boost in trust with contextual proof",
+    statDescription: "boost in user trust with embeded contextual proof",
     description: "We don't just drop logos — we embed proof (like client wins or transformations) within relevant sections. This multiplies trust where it matters."
   },
   {

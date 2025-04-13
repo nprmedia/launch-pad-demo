@@ -53,7 +53,7 @@ export default function Phase3({ onComplete }: Phase3Props) {
 
       {/* TOOLTIP INTRO */}
       <motion.div
-        className="absolute z-30 px-6 py-4 text-sm font-semibold text-black bg-white rounded-xl shadow-xl"
+        className="absolute z-30 px-6 py-4 text-sm font-semibold text-black bg-white items-center rounded-xl shadow-xl"
         initial={{ scale: 0, opacity: 0, y: 0 }}
         animate={{ scale: 1, opacity: 1, y: -120 }}
         transition={{ delay: 2.0, duration: 0.9, ease: "anticipate" }}
@@ -71,7 +71,7 @@ export default function Phase3({ onComplete }: Phase3Props) {
           className="mt-8 px-5 py-3 rounded-xl border border-orange-500 text-orange-400 text-sm font-semibold shadow-orange-glow backdrop-blur z-40"
         >
           System Access Granted: Demo Framework Online
-          <div className="mt-1 text-xs opacity-70">Press → or scroll down to begin.</div>
+          <div className="mt-1 text-sm opacity-70 text-white">Press → or scroll down to begin.</div>
         </motion.div>
       )}
     </div>
