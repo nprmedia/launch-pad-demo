@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Sparkles } from 'lucide-react';
 import { useOverlaySteps } from '@/lib/useOverlaySteps';
 import { motion, AnimatePresence } from 'framer-motion';
 

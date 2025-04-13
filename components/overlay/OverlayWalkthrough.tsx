@@ -4,20 +4,27 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
+
+// Prop types for lazy components
+type TooltipCardProps = { stepIndex: number };
+type ProgressIndicatorProps = { stepIndex: number };
+type RestartButtonProps = { onRestart: () => void };
+
 const TooltipCard = dynamic(() =>
-  import('./TooltipCard').then(mod => mod.default as React.ComponentType<any>),
+  import('./TooltipCard').then(mod => mod.default as React.ComponentType<TooltipCardProps>),
   { ssr: false }
 );
 
 const ProgressIndicator = dynamic(() =>
-  import('./ProgressIndicator').then(mod => mod.default as React.ComponentType<any>),
+  import('./ProgressIndicator').then(mod => mod.default as React.ComponentType<ProgressIndicatorProps>),
   { ssr: false }
 );
 
 const RestartButton = dynamic(() =>
-  import('./RestartButton').then(mod => mod.default as React.ComponentType<any>),
+  import('./RestartButton').then(mod => mod.default as React.ComponentType<RestartButtonProps>),
   { ssr: false }
 );
+
 import { WarningOverlay } from './WarningOverlay';
 import { useOverlaySteps } from '@/lib/useOverlaySteps';
 
