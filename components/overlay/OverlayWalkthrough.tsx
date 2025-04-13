@@ -51,19 +51,13 @@ export const OverlayWalkthrough = () => {
     });
   };
 
-  const runStepLogic = useCallback(async () => {
-    await validateAndScrollToElement(currentStep.id);
-  }, [currentStep.id]);
-
-  useEffect(() => {
+    useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') {
         isKeyboardScroll.current = true;
         setStepIndex((i) => {
           const newIndex = Math.min(i + 1, steps.length - 1);
-          setTimeout(() => {
-            validateAndScrollToElement(steps[newIndex].id);
-          }, 0);
+          void validateAndScrollToElement(steps[newIndex].id);
           return newIndex;
         });
       } else if (e.key === 'ArrowLeft') {
