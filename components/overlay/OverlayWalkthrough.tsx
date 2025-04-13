@@ -53,31 +53,6 @@ export const OverlayWalkthrough = () => {
   };
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') {
-        isKeyboardScroll.current = true;
-        setStepIndex((i) => {
-          const newIndex = Math.min(i + 1, steps.length - 1);
-          void validateAndScrollToElement(steps[newIndex].id);
-          return newIndex;
-        });
-      } else if (e.key === 'ArrowLeft') {
-        isKeyboardScroll.current = true;
-        setStepIndex((i) => {
-          const newIndex = Math.max(i - 1, 0);
-          void validateAndScrollToElement(steps[newIndex].id);
-          return newIndex;
-        });
-      }
-    };
-
-    window.addEventListener('keydown', handler);
-    return () => {
-      window.removeEventListener('keydown', handler);
-    };
-  }, [steps.length]);
-
-  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
