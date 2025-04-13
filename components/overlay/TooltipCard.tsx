@@ -69,3 +69,5 @@ export const TooltipCard = ({ stepIndex }: TooltipCardProps) => {
     </AnimatePresence>
   );
 };
+
+export default TooltipCard;

@@ -3,9 +3,21 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { TooltipCard } from './TooltipCard';
-import { ProgressIndicator } from './ProgressIndicator';
-import { RestartButton } from './RestartButton';
+import dynamic from 'next/dynamic';
+const TooltipCard = dynamic(() =>
+  import('./TooltipCard').then(mod => mod.default as React.ComponentType<any>),
+  { ssr: false }
+);
+
+const ProgressIndicator = dynamic(() =>
+  import('./ProgressIndicator').then(mod => mod.default as React.ComponentType<any>),
+  { ssr: false }
+);
+
+const RestartButton = dynamic(() =>
+  import('./RestartButton').then(mod => mod.default as React.ComponentType<any>),
+  { ssr: false }
+);
 import { WarningOverlay } from './WarningOverlay';
 import { useOverlaySteps } from '@/lib/useOverlaySteps';
 
@@ -53,6 +65,27 @@ export const OverlayWalkthrough = () => {
   };
 
   useEffect(() => {
+    if (!acknowledged) return;
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') {
+        isKeyboardScroll.current = true;
+        setStepIndex((i) => {
+          const newIndex = Math.min(i + 1, steps.length - 1);
+          void validateAndScrollToElement(steps[newIndex].id);
+          return newIndex;
+        });
+      } else if (e.key === 'ArrowLeft') {
+        isKeyboardScroll.current = true;
+        setStepIndex((i) => {
+          const newIndex = Math.max(i - 1, 0);
+          void validateAndScrollToElement(steps[newIndex].id);
+          return newIndex;
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handler);
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -71,11 +104,14 @@ export const OverlayWalkthrough = () => {
       if (el) observer.observe(el);
     });
 
-    return () => observer.disconnect();
-  }, [steps]);
+    return () => {
+      window.removeEventListener('keydown', handler);
+      observer.disconnect();
+    };
+  }, [steps, setStepIndex, acknowledged]);
 
   return (
-    <>
+    <div className="relative z-[9990]">
       {!acknowledged && <WarningOverlay onAcknowledge={() => setAcknowledged(true)} />}
       {acknowledged && (
         <div className="absolute top-4 right-4 space-y-3 pointer-events-auto">
@@ -88,8 +124,7 @@ export const OverlayWalkthrough = () => {
             }}
           />
         </div>
-      )}
-    </>
+      )}    </div>
   );
 };
 
