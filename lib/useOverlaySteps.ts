@@ -1,7 +1,5 @@
 // File: lib/useOverlaySteps.ts 
 
-import { stat } from "fs";
-
 export const steps = [
   {
     id: "hero-section",
