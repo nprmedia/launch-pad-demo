@@ -8,26 +8,6 @@ import { ProgressIndicator } from './ProgressIndicator';
 import { RestartButton } from './RestartButton';
 import { useOverlaySteps } from '@/lib/useOverlaySteps';
 
-const ProgressHUD = ({ step }: { step: number }) => {
-  const steps = ["Start", "Design", "Optimize", "Money"];
-  return (
-    <div className="fixed bottom-6 left-0 right-0 flex justify-center z-50 text-xs text-orange-400 font-medium opacity-80">
-      <div className="flex gap-3">
-        {steps.map((label, index) => (
-          <div
-            key={label}
-            className={`transition-colors duration-300 ${
-              index === step ? "text-white" : "text-orange-500"
-            }`}
-          >
-            {index < step ? "●" : index === step ? "◉" : "○"} {label}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 export const OverlayWalkthrough = () => {
   const steps = useOverlaySteps();
   const [stepIndex, setStepIndex] = useState(0);
@@ -133,8 +113,6 @@ export const OverlayWalkthrough = () => {
         isKeyboardScroll.current = true;
         setStepIndex(0);
       }} />
-      <ProgressHUD step={3} />
-      <div id="active-section-id" data-current-id={currentStep.id} className="hidden" />
     </>
   );
 };

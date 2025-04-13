@@ -1,6 +1,3 @@
-// File: components/sections/SocialProofSection.tsx
-// Purpose: Showcases credibility via testimonial quotes and brand logos
-
 'use client';
 
 import { motion } from 'framer-motion';
@@ -20,28 +17,21 @@ const testimonials = [
   },
 ];
 
-const logos = [
-  '/logos/logo1.svg',
-  '/logos/logo2.svg',
-  '/logos/logo3.svg',
-  '/logos/logo4.svg',
-];
-
 export const SocialProofSection = () => {
   return (
-    <section id="social-proof-section" className="w-full min-h-screen flex items-center justify-center py-24 px-6 bg-gray-50 dark:bg-gray-950">
-      <div className="max-w-6xl mx-auto text-center">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white"
-        >
+    <section className="relative w-full py-24 px-6 bg-white text-center overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+        viewport={{ once: true }}
+        className="max-w-6xl mx-auto"
+      >
+        <h2 className="text-3xl md:text-4xl font-semibold text-gray-900">
           Trusted by Coaches Like You
-        </motion.h2>
+        </h2>
 
-        <div className="mt-10 grid gap-10 md:grid-cols-2">
+        <div className="mt-12 grid gap-10 md:grid-cols-2">
           {testimonials.map((t, i) => (
             <motion.div
               key={i}
@@ -49,31 +39,24 @@ export const SocialProofSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.2, duration: 0.5 }}
               viewport={{ once: true }}
-              className="p-6 bg-white dark:bg-black rounded-xl shadow border border-gray-200 dark:border-gray-800 text-left"
+              className="p-6 bg-neutral-50 rounded-xl shadow border border-neutral-200 text-left"
             >
-              <p className="text-gray-700 dark:text-gray-300 italic">“{t.quote}”</p>
-              <div className="mt-4 font-semibold text-gray-900 dark:text-white">
-                {t.name} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">/ {t.role}</span>
+              <p className="text-gray-700 italic">“{t.quote}”</p>
+              <div className="mt-4 font-semibold text-gray-900 ">
+                {t.name}{' '}
+                <span className="text-sm font-normal text-gray-500 ">/ {t.role}</span>
               </div>
             </motion.div>
           ))}
         </div>
+      </motion.div>
 
-        <div className="mt-16 flex flex-wrap items-center justify-center gap-8">
-          {logos.map((logo, i) => (
-            <motion.img
-              key={i}
-              src={logo}
-              alt="Brand logo"
-              className="h-8 grayscale opacity-70 hover:opacity-100 transition"
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1, duration: 0.4 }}
-              viewport={{ once: true }}
-            />
-          ))}
-        </div>
-      </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.08 }}
+        transition={{ duration: 1.6, delay: 0.2 }}
+        className="absolute -z-10 top-1/2 left-1/2 w-[700px] h-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500 blur-[140px]"
+      />
     </section>
   );
 };

@@ -1,6 +1,3 @@
-// File: components/sections/FAQSection.tsx
-// Purpose: Answer key objections with accessible accordion UI and animated transitions
-
 'use client';
 
 import { useState } from 'react';
@@ -30,20 +27,27 @@ export const FAQSection = () => {
   };
 
   return (
-    <section className="w-full min-h-screen flex items-center justify-center py-24 px-6 bg-white dark:bg-black">
-      <div className="max-w-3xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+    <section className="relative w-full py-24 px-6 bg-white text-center overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+        viewport={{ once: true }}
+        className="max-w-3xl mx-auto"
+      >
+        <h2 className="text-3xl md:text-4xl font-semibold text-gray-900">
           Frequently Asked Questions
         </h2>
+
         <div className="mt-12 space-y-6 text-left">
           {faqs.map((faq, i) => (
             <div
               key={i}
-              className="border border-gray-200 dark:border-gray-700 rounded-xl p-4"
+              className="border border-neutral-200 rounded-xl p-4 bg-f4f4f4 text-black-900"
             >
               <button
                 onClick={() => toggle(i)}
-                className="flex items-center justify-between w-full text-lg font-medium text-gray-800 dark:text-white focus:outline-none"
+                className="flex items-center justify-between w-full text-base md:text-lg font-medium text-gray-700 focus:outline-none"
               >
                 {faq.question}
                 <ChevronDown
@@ -58,7 +62,7 @@ export const FAQSection = () => {
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="overflow-hidden mt-2 text-gray-600 dark:text-gray-300"
+                    className="overflow-hidden mt-2 text-sm text-gray-600"
                   >
                     {faq.answer}
                   </motion.div>
@@ -67,7 +71,14 @@ export const FAQSection = () => {
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.08 }}
+        transition={{ duration: 1.6, delay: 0.2 }}
+        className="absolute -z-10 top-1/2 left-1/2 w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500 blur-[140px]"
+      />
     </section>
   );
 };

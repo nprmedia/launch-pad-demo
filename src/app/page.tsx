@@ -9,6 +9,7 @@ import { CTASection } from "@/components/sections/CTASection";
 import { FooterSection } from "@/components/sections/FooterSection";
 import { OverlayWalkthroughWrapper } from "@/components/overlay/OverlayWalkthroughWrapper";
 import { useEffect, useState } from "react";
+import { FAQSection } from "@/components/sections/FAQSection";
 
 export default function Page() {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -51,6 +52,9 @@ export default function Page() {
         </SectionWrapper>
         <SectionWrapper id="social-proof-section">
           <SocialProofSection />
+        </SectionWrapper>
+        <SectionWrapper id="FAQ-section">
+          <FAQSection />
         </SectionWrapper>
         <SectionWrapper id="cta-section">
           <CTASection />

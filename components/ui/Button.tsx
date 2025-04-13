@@ -17,11 +17,11 @@ const buttonVariants = cva(
     variants: {
       intent: {
         primary:
-          'bg-brand text-white hover:bg-brand/90 focus:ring-brand dark:bg-white dark:text-black',
+          'bg-orange-500 text-white hover:bg-black hover:text-white focus:ring-brand',
         secondary:
-          'bg-white text-brand border border-brand hover:bg-brand hover:text-white dark:bg-black dark:text-white dark:border-white dark:hover:bg-white dark:hover:text-black',
+          'bg-white text-black border border-black hover:bg-transparent hover:text-black hover:border-transparent',
         ghost:
-          'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300',
+          'bg-transparent hover:bg-black text-white hover:text-white ',
       },
       size: {
         default: 'h-10 px-6',

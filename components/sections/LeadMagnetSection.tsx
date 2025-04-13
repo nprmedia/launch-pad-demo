@@ -1,6 +1,3 @@
-// File: components/sections/LeadMagnetSection.tsx
-// Purpose: Email capture section with mock Mailchimp integration, form validation, and success animation
-
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -17,7 +14,6 @@ export const LeadMagnetSection = () => {
   const [submitted, setSubmitted] = useState(false);
 
   const onSubmit = async (data: FormData) => {
-    // Simulate Mailchimp submission with delay
     await new Promise((res) => setTimeout(res, 800));
     console.log('Submitted data:', data);
     setSubmitted(true);
@@ -26,44 +22,58 @@ export const LeadMagnetSection = () => {
   };
 
   return (
-    <section className="w-full min-h-screen flex items-center justify-centerpy-20 px-6 bg-gray-50 dark:bg-gray-900 text-center" id="lead-magnet-section">
+    <section className="relative w-full py-24 px-6 flex flex-col items-center justify-center bg-white text-center overflow-hidden">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
         viewport={{ once: true }}
-        className="max-w-xl mx-auto"
+        className="relative z-10 max-w-xl w-full"
       >
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-          Get the Free Strategy Guide
+        <h2 className="text-3xl md:text-4xl font-semibold text-gray-900">
+          Get the 7-Figure Systems Playbook
         </h2>
-        <p className="mt-2 text-gray-600 dark:text-gray-300">
-          Discover how to streamline your coaching offer and attract ideal clients—instantly.
+        <p className="mt-2 text-sm md:text-base text-gray-600 ">
+          Actionable systems and strategy for scaling your coaching business — sent straight to your inbox.
         </p>
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col sm:flex-row items-center gap-4 justify-center">
+
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
           <input
             type="email"
             {...register('email', { required: 'Email is required' })}
-            placeholder="Enter your email"
-            className="w-full sm:w-auto flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand"
+            placeholder="Your email"
+            className="w-full flex-1 px-4 py-3 rounded-md border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
-          <Button type="submit" intent="primary" className="w-full sm:w-auto">
-            Send it my way
+          <Button intent="primary" type="submit" className="w-full sm:w-auto">
+            Get Free Guide
           </Button>
         </form>
+
         {errors.email && (
           <p className="mt-2 text-sm text-red-500">{errors.email.message}</p>
         )}
+
         {submitted && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-4 text-green-600 dark:text-green-400"
+            className="mt-4 text-green-600"
           >
             Guide sent! Check your inbox.
           </motion.p>
         )}
+
+        <p className="mt-2 text-xs text-gray-500">
+          No spam. Just strategy.
+        </p>
       </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.1 }}
+        transition={{ duration: 1.6, delay: 0.2 }}
+        className="absolute -z-10 top-1/2 left-1/2 w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500 blur-[140px]"
+      />
     </section>
   );
 };

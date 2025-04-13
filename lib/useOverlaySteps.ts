@@ -22,6 +22,11 @@ export const steps = [
     description: "Founders trust what others have validated. We use social cues and reputational anchors to make hiring you feel like the obvious choice."
   },
   {
+    id: "FAQ-section",
+    label: "FAQ Section",
+    description: "Placeholder"
+  },
+  {
     id: "cta-section",
     label: "CTA",
     description: "This is where curiosity becomes conversion. Every CTA here is psychologically timed, visually primed, and conversion-optimized to drive action."
