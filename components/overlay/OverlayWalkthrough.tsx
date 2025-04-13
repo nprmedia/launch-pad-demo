@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TooltipCard } from './TooltipCard';
 import { ProgressIndicator } from './ProgressIndicator';
 import { RestartButton } from './RestartButton';
@@ -12,8 +12,7 @@ export const OverlayWalkthrough = () => {
   const steps: { id: string; label: string; description: string; statNumber?: string; statDescription?: string }[] = useOverlaySteps();
   const [stepIndex, setStepIndex] = useState(0);
   const isKeyboardScroll = useRef(false);
-  const currentStep = steps[stepIndex];
-
+  
   const validateAndScrollToElement = async (stepId: string): Promise<HTMLElement | null> => {
     return new Promise((resolve) => {
       let retries = 0;
@@ -64,9 +63,7 @@ export const OverlayWalkthrough = () => {
         isKeyboardScroll.current = true;
         setStepIndex((i) => {
           const newIndex = Math.max(i - 1, 0);
-          setTimeout(() => {
-            validateAndScrollToElement(steps[newIndex].id);
-          }, 0);
+          void validateAndScrollToElement(steps[newIndex].id);
           return newIndex;
         });
       } else if (e.key === 'Escape') {
